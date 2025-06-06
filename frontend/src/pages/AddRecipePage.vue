@@ -70,7 +70,7 @@ const toggleSecondary = (idx: number) => {
         <div v-for="(ing, idx) in ingredients" :key="idx" class="mb-2">
           <IngredientInput v-model="ingredients[idx]" />
           <p v-if="idx === 0" class="text-sm text-gray-500">Ingrédient principal de la recette</p>
-          <div v-else class="flex items-center space-x-2">
+          <div v-if="idx > 0" class="flex items-center space-x-2">
             <label class="flex items-center space-x-1">
               <input type="checkbox" :checked="secondaryIdx === idx" @change="toggleSecondary(idx)" />
               <span>Ingrédient secondaire</span>

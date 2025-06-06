@@ -2,6 +2,7 @@ export interface RecipeRow {
   id: string
   ingredient_principal_id: string | null
   ingredient_secondaire_id: string | null
+  last_used: string | null
 }
 
 export interface Selection {
@@ -17,7 +18,14 @@ export interface MenuEntry {
 export function generateMenuEntries(recipes: RecipeRow[], selection: Selection): MenuEntry[] {
   const used = new Set<string>()
   const result: MenuEntry[] = []
-  const pool = recipes.slice()
+  const pool = recipes
+    .slice()
+    .sort((a, b) => {
+      if (a.last_used === b.last_used) return 0
+      if (a.last_used === null) return -1
+      if (b.last_used === null) return 1
+      return a.last_used.localeCompare(b.last_used)
+    })
   for (const jour of Object.keys(selection)) {
     for (const moment of ['dejeuner', 'diner'] as const) {
       if (!selection[jour][moment]) continue

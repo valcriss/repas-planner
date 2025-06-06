@@ -18,10 +18,15 @@ RUN npm run build
 FROM node:20-slim
 WORKDIR /app/backend
 COPY backend/package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 COPY --from=backend-build /app/backend/dist ./dist
 COPY --from=frontend-build /app/frontend/dist ./dist/public
+COPY backend/migrations ./migrations
+COPY backend/migrate-config.js ./migrate-config.js
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 ENV NODE_ENV=production
 ENV FRONTEND_PATH=/app/backend/dist/public
 EXPOSE 3000
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["node", "dist/app.js"]

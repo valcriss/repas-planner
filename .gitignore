@@ -1,0 +1,17 @@
+# Ignore environment configuration files
+.env
+*.env
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+coverage/
+
+# Build artifacts
+node_modules/
+dist/
+
+# macOS metadata
+.DS_Store

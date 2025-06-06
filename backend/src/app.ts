@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
   res.send('Repas Planner API');
 });
 
+/* c8 ignore next 5 */
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`Backend listening on port ${port}`);

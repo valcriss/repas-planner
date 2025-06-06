@@ -15,6 +15,25 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction): Promis
 });
 
 // GET /recipes/:id - retrieve a single recipe
+// GET /recipes/:id/ingredients - list ingredients for a recipe
+router.get('/:id/ingredients', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { id } = req.params;
+  try {
+    const { rows } = await pool.query(
+      `SELECT i.id, i.nom, ri.quantite, ri.unite
+       FROM recipe_ingredients ri
+       JOIN ingredients i ON i.id = ri.ingredient_id
+       WHERE ri.recipe_id = $1
+       ORDER BY i.nom`,
+      [id]
+    );
+    res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /recipes/:id - retrieve a single recipe
 router.get('/:id', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
   try {

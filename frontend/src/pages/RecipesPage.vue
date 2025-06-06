@@ -17,12 +17,15 @@ onMounted(async () => {
 <template>
   <div>
     <div class="flex items-center justify-between mb-4">
-      <h1 class="text-2xl font-bold">Recipes</h1>
+      <h1 class="text-2xl font-bold">
+        Recipes
+      </h1>
       <RouterLink
         to="/recipes/add"
         class="px-3 py-1 bg-blue-600 text-white rounded"
-        >Ajouter une recette</RouterLink
       >
+        Ajouter une recette
+      </RouterLink>
     </div>
     <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       <RouterLink
@@ -31,8 +34,12 @@ onMounted(async () => {
         :to="`/recipes/${recipe.id}`"
         class="bg-white rounded shadow p-4 block hover:bg-gray-50"
       >
-        <h2 class="font-medium text-lg mb-1">{{ recipe.nom }}</h2>
-        <p class="text-sm text-gray-600">{{ recipe.instructions }}</p>
+        <h2 class="font-medium text-lg mb-1">
+          {{ recipe.nom }}
+        </h2>
+        <p class="text-sm text-gray-600">
+          {{ recipe.instructions }}
+        </p>
       </RouterLink>
     </div>
   </div>

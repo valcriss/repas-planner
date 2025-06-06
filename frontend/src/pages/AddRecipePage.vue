@@ -87,36 +87,84 @@ onMounted(async () => {
 </script>
 <template>
   <div class="max-w-md mx-auto">
-    <h1 class="text-2xl font-bold mb-4">{{ isEdit ? 'Modifier la recette' : 'Ajouter une recette' }}</h1>
-    <form @submit.prevent="submit" class="space-y-4">
+    <h1 class="text-2xl font-bold mb-4">
+      {{ isEdit ? 'Modifier la recette' : 'Ajouter une recette' }}
+    </h1>
+    <form
+      class="space-y-4"
+      @submit.prevent="submit"
+    >
       <div>
         <label class="block mb-1">Nom</label>
-        <input v-model="nom" class="border rounded w-full p-2" required />
+        <input
+          v-model="nom"
+          class="border rounded w-full p-2"
+          required
+        >
       </div>
       <div>
         <label class="block mb-1">Instructions</label>
-        <textarea v-model="instructions" class="border rounded w-full p-2" />
+        <textarea
+          v-model="instructions"
+          class="border rounded w-full p-2"
+        />
       </div>
       <div>
         <label class="block mb-1">Image URL</label>
-        <input v-model="imageUrl" class="border rounded w-full p-2" />
+        <input
+          v-model="imageUrl"
+          class="border rounded w-full p-2"
+        >
       </div>
       <div>
         <label class="block mb-1">Ingrédients</label>
-        <div v-for="(_, idx) in ingredients" :key="idx" class="mb-2">
+        <div
+          v-for="(_, idx) in ingredients"
+          :key="idx"
+          class="mb-2"
+        >
           <IngredientInput v-model="ingredients[idx]" />
-          <p v-if="idx === 0" class="text-sm text-gray-500">Ingrédient principal de la recette</p>
-          <div v-if="idx > 0" class="flex items-center space-x-2">
+          <p
+            v-if="idx === 0"
+            class="text-sm text-gray-500"
+          >
+            Ingrédient principal de la recette
+          </p>
+          <div
+            v-if="idx > 0"
+            class="flex items-center space-x-2"
+          >
             <label class="flex items-center space-x-1">
-              <input type="checkbox" :checked="secondaryIdx === idx" @change="toggleSecondary(idx)" />
+              <input
+                type="checkbox"
+                :checked="secondaryIdx === idx"
+                @change="toggleSecondary(idx)"
+              >
               <span>Ingrédient secondaire</span>
             </label>
-            <button type="button" @click="removeIngredient(idx)" class="text-red-600 text-sm">Supprimer l'ingrédient</button>
+            <button
+              type="button"
+              class="text-red-600 text-sm"
+              @click="removeIngredient(idx)"
+            >
+              Supprimer l'ingrédient
+            </button>
           </div>
         </div>
-        <button type="button" @click="addIngredient" class="px-2 py-1 bg-gray-200 rounded">Ajouter un ingrédient</button>
+        <button
+          type="button"
+          class="px-2 py-1 bg-gray-200 rounded"
+          @click="addIngredient"
+        >
+          Ajouter un ingrédient
+        </button>
       </div>
-      <button type="submit" class="px-3 py-1 bg-blue-600 text-white rounded">Enregistrer</button>
+      <button
+        type="submit"
+        class="px-3 py-1 bg-blue-600 text-white rounded"
+      >
+        Enregistrer
+      </button>
     </form>
   </div>
 </template>

@@ -42,5 +42,18 @@ describe('IngredientInput', () => {
     await flushPromises()
     expect(wrapper.findAll('ul li')).toHaveLength(0)
   })
+
+  it('clears id when ingredient name is changed', async () => {
+    const wrapper = mount(IngredientInput, {
+      props: { modelValue: { id: 'i1', nom: 'Tomate', quantite: '', unite: 'kg' } }
+    })
+
+    await wrapper.get('input[placeholder="Ingrédient"]').setValue('Nouvelle')
+    await flushPromises()
+
+    const value = wrapper.emitted('update:modelValue')![0][0] as { id?: string }
+    expect(value.id).toBeUndefined()
+    expect(wrapper.get('input[placeholder="Unité"]').attributes('disabled')).toBeUndefined()
+  })
 })
 

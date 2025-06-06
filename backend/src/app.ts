@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
 import recipeRoutes from './routes/recipes';
 import ingredientRoutes from './routes/ingredients';
 import uniteRoutes from './routes/unites';
@@ -10,9 +11,11 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+const frontendPath = process.env.FRONTEND_PATH || path.join(__dirname, 'public');
 
 app.use(express.json());
 app.use(cors());
+app.use(express.static(frontendPath, { index: false }));
 app.use('/recipes', recipeRoutes);
 app.use('/ingredients', ingredientRoutes);
 app.use('/unites', uniteRoutes);

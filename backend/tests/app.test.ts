@@ -32,11 +32,17 @@ afterAll(() => {
   rmSync(tempDir, { recursive: true, force: true });
 });
 
-describe('GET /', () => {
-  it('returns API message', async () => {
+describe('Frontend serving', () => {
+  it('serves index.html at root', async () => {
     const res = await request(app).get('/');
     expect(res.status).toBe(200);
-    expect(res.text).toBe('Repas Planner API');
+    expect(res.text).toBe('hello');
+  });
+
+  it('serves index.html for other paths', async () => {
+    const res = await request(app).get('/random');
+    expect(res.status).toBe(200);
+    expect(res.text).toBe('hello');
   });
 });
 

@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import recipeRoutes from './routes/recipes';
+import ingredientRoutes from './routes/ingredients';
 
 dotenv.config();
 
@@ -9,6 +10,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use('/recipes', recipeRoutes);
+app.use('/ingredients', ingredientRoutes);
 
 app.get('/', (req, res) => {
   res.send('Repas Planner API');

@@ -31,21 +31,51 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction): Prom
 
 // POST /recipes - create a new recipe
 router.post('/', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url } = req.body;
+  const {
+    nom,
+    instructions,
+    ingredient_principal_id,
+    ingredient_secondaire_id,
+    image_url,
+    ingredients
+  } = req.body;
   if (!nom || !ingredient_principal_id) {
     res.status(400).json({ error: 'Missing required fields' });
     return;
   }
   const id = randomUUID();
+  const client = await pool.connect();
   try {
-    const { rows } = await pool.query(
+    await client.query('BEGIN');
+    const { rows } = await client.query(
       `INSERT INTO recipes (id, nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [id, nom, instructions || null, ingredient_principal_id, ingredient_secondaire_id || null, image_url || null]
     );
+    if (Array.isArray(ingredients)) {
+      for (const ing of ingredients) {
+        let ingredientId = ing.id;
+        if (!ingredientId) {
+          const newId = randomUUID();
+          const { rows: ingRows } = await client.query(
+            'INSERT INTO ingredients (id, nom, unite) VALUES ($1, $2, $3) RETURNING id',
+            [newId, ing.nom, ing.unite]
+          );
+          ingredientId = ingRows[0].id;
+        }
+        await client.query(
+          'INSERT INTO recipe_ingredients (id, recipe_id, ingredient_id, quantite, unite) VALUES ($1, $2, $3, $4, $5)',
+          [randomUUID(), id, ingredientId, ing.quantite, ing.unite]
+        );
+      }
+    }
+    await client.query('COMMIT');
     res.status(201).json(rows[0]);
   } catch (err) {
+    await client.query('ROLLBACK');
     next(err);
+  } finally {
+    client.release();
   }
 });
 

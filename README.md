@@ -35,7 +35,7 @@
     - optional `image_url` field
   - `recipe_ingredients`
   - `menus`
-  - `menu_recipes`
+  - `menu_recipes` (stores one row per day and meal: `dejeuner` or `diner`)
 - Schema managed using `node-pg-migrate`
 - Environment file `.env` used for PostgreSQL connection
 

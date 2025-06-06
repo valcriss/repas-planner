@@ -35,12 +35,13 @@ async function remove() {
     v-if="recipe"
     class="max-w-2xl mx-auto"
   >
-    <RouterLink
-      to="/recipes"
+    <button
+      type="button"
       class="text-blue-600"
+      @click="router.back()"
     >
       &larr; Retour
-    </RouterLink>
+    </button>
     <h1 class="text-3xl font-bold my-4">
       {{ recipe.nom }}
     </h1>

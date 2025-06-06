@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { randomUUID } from 'crypto';
 import pool from '../db';
+import { findOrCreateUnite } from '../unite';
 
 const router = express.Router();
 
@@ -20,11 +21,18 @@ router.get('/:id/ingredients', async (req: Request, res: Response, next: NextFun
   const { id } = req.params;
   try {
     const { rows } = await pool.query(
-      `SELECT i.id, i.nom, ri.quantite, ri.unite
+      `SELECT i.id, i.nom, ri.quantite, u.nom AS unite,
+        CASE
+          WHEN ri.ingredient_id = r.ingredient_principal_id THEN 0
+          WHEN ri.ingredient_id = r.ingredient_secondaire_id THEN 1
+          ELSE 2
+        END AS ordre
        FROM recipe_ingredients ri
        JOIN ingredients i ON i.id = ri.ingredient_id
+       JOIN recipes r ON r.id = ri.recipe_id
+       LEFT JOIN unites u ON u.id = ri.unite_id
        WHERE ri.recipe_id = $1
-       ORDER BY i.nom`,
+       ORDER BY ordre, i.nom`,
       [id]
     );
     res.json(rows);
@@ -79,9 +87,10 @@ router.post('/', async (req: Request, res: Response, next: NextFunction): Promis
       let firstId = firstIng.id as string | undefined;
       if (!firstId) {
         const newId = randomUUID();
+        const uniteId = await findOrCreateUnite(client, firstIng.unite);
         const { rows: ingRows } = await client.query(
-          'INSERT INTO ingredients (id, nom, unite) VALUES ($1, $2, $3) RETURNING id',
-          [newId, firstIng.nom, firstIng.unite]
+          'INSERT INTO ingredients (id, nom, unite_id) VALUES ($1, $2, $3) RETURNING id',
+          [newId, firstIng.nom, uniteId]
         );
         firstId = ingRows[0].id;
       }
@@ -98,17 +107,18 @@ router.post('/', async (req: Request, res: Response, next: NextFunction): Promis
     if (Array.isArray(ingredients)) {
       for (const ing of ingredients) {
         let ingredientId = ing.id;
+        const uniteId = await findOrCreateUnite(client, ing.unite);
         if (!ingredientId) {
           const newId = randomUUID();
           const { rows: ingRows } = await client.query(
-            'INSERT INTO ingredients (id, nom, unite) VALUES ($1, $2, $3) RETURNING id',
-            [newId, ing.nom, ing.unite]
+            'INSERT INTO ingredients (id, nom, unite_id) VALUES ($1, $2, $3) RETURNING id',
+            [newId, ing.nom, uniteId]
           );
           ingredientId = ingRows[0].id;
         }
         await client.query(
-          'INSERT INTO recipe_ingredients (id, recipe_id, ingredient_id, quantite, unite) VALUES ($1, $2, $3, $4, $5)',
-          [randomUUID(), id, ingredientId, ing.quantite, ing.unite]
+          'INSERT INTO recipe_ingredients (id, recipe_id, ingredient_id, quantite, unite_id) VALUES ($1, $2, $3, $4, $5)',
+          [randomUUID(), id, ingredientId, ing.quantite, uniteId]
         );
       }
     }

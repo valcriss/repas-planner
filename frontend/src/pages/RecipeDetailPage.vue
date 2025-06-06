@@ -31,28 +31,55 @@ async function remove() {
 }
 </script>
 <template>
-  <div v-if="recipe" class="max-w-2xl mx-auto">
-    <RouterLink to="/recipes" class="text-blue-600">&larr; Retour</RouterLink>
-    <h1 class="text-3xl font-bold my-4">{{ recipe.nom }}</h1>
-    <img v-if="recipe.image_url" :src="recipe.image_url" class="mb-4 w-full object-cover rounded" />
-    <h2 class="text-xl font-semibold mb-2">Ingrédients</h2>
+  <div
+    v-if="recipe"
+    class="max-w-2xl mx-auto"
+  >
+    <RouterLink
+      to="/recipes"
+      class="text-blue-600"
+    >
+      &larr; Retour
+    </RouterLink>
+    <h1 class="text-3xl font-bold my-4">
+      {{ recipe.nom }}
+    </h1>
+    <img
+      v-if="recipe.image_url"
+      :src="recipe.image_url"
+      class="mb-4 w-full object-cover rounded"
+    >
+    <h2 class="text-xl font-semibold mb-2">
+      Ingrédients
+    </h2>
     <ul class="list-disc list-inside mb-4">
-      <li v-for="ing in ingredients" :key="ing.id">
+      <li
+        v-for="ing in ingredients"
+        :key="ing.id"
+      >
         {{ ing.nom }} : {{ ing.quantite }} {{ ing.unite }}
       </li>
     </ul>
-    <h2 class="text-xl font-semibold mb-2">Description</h2>
-    <p class="whitespace-pre-line">{{ recipe.instructions }}</p>
+    <h2 class="text-xl font-semibold mb-2">
+      Description
+    </h2>
+    <p class="whitespace-pre-line">
+      {{ recipe.instructions }}
+    </p>
     <div class="mt-4 space-x-2">
       <RouterLink
         :to="`/recipes/${recipe.id}/edit`"
         class="px-3 py-1 bg-blue-600 text-white rounded"
-      >Éditer</RouterLink>
+      >
+        Éditer
+      </RouterLink>
       <button
         type="button"
-        @click="remove"
         class="px-3 py-1 bg-red-600 text-white rounded"
-      >Supprimer</button>
+        @click="remove"
+      >
+        Supprimer
+      </button>
     </div>
   </div>
 </template>

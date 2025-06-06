@@ -16,10 +16,10 @@ const frontendPath = process.env.FRONTEND_PATH || path.join(__dirname, 'public')
 app.use(express.json());
 app.use(cors());
 app.use(express.static(frontendPath));
-app.use('/recipes', recipeRoutes);
-app.use('/ingredients', ingredientRoutes);
-app.use('/unites', uniteRoutes);
-app.use('/menus', menuRoutes);
+app.use('/api/recipes', recipeRoutes);
+app.use('/api/ingredients', ingredientRoutes);
+app.use('/api/unites', uniteRoutes);
+app.use('/api/menus', menuRoutes);
 
 app.get('*', (_req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));

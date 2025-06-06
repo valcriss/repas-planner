@@ -11,7 +11,7 @@ describe('fetchShoppingList', () => {
   it('returns ingredients', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(data) }))
     const res = await fetchShoppingList('w')
-    expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/menus/w/shopping-list')
+    expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/api/menus/w/shopping-list')
     expect(res).toEqual(data)
   })
 
@@ -25,11 +25,11 @@ describe('exportRecipes/importRecipes', () => {
   it('calls export and import endpoints', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve([]) }))
     await exportRecipes()
-    expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/recipes/export')
+    expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/api/recipes/export')
     ;(globalThis.fetch as unknown as vi.Mock).mockResolvedValue({ ok: true })
     await importRecipes([])
     const call = (globalThis.fetch as unknown as vi.Mock).mock.calls[1]
-    expect(call[0]).toBe('http://localhost:3000/recipes/import')
+    expect(call[0]).toBe('http://localhost:3000/api/recipes/import')
     expect(call[1].method).toBe('POST')
   })
 })

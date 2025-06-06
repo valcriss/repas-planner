@@ -31,7 +31,7 @@ describe('PUT /recipes/:id', () => {
       .mockResolvedValueOnce({}) // DELETE unites
       .mockResolvedValueOnce({}) // COMMIT
     const res = await request(app)
-      .put('/recipes/r1')
+      .put('/api/recipes/r1')
       .send({ nom: 'r', ingredient_principal_id: 'i1', ingredients: [] })
     expect(res.status).toBe(200)
     const calls = mockedQuery.mock.calls.map(c => c[0])

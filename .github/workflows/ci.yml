@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧾 Checkout du code
+        uses: actions/checkout@v3
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 23
+          cache: 'npm'
+
+      - name: 📦 Installation des dépendances Backend
+        run: cd backend && npm ci
+
+      - name: 📦 Installation des dépendances Frontend
+        run: cd frontend && npm ci
+
+      - name: 🔍 Lint Backend
+        run: cd backend && npm run lint
+
+      - name: 🔍 Lint Frontend
+        run: cd frontend && npm run lint
+
+      - name: 🧪 Tests + Coverage Backend
+        run: cd backend && npm run test
+
+      - name: 🧪 Tests + Coverage Frontend
+        run: cd frontend && npm run test
+
+      - name: 📁 Upload du rapport HTML de couverture Backend
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: coverage-report-backend
+          path: backend/coverage/lcov-report
+
+      - name: 📁 Upload du rapport HTML de couverture Frontend
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: coverage-report-frontend
+          path: frontend/coverage/lcov-report
+  

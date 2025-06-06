@@ -36,6 +36,11 @@ export interface RecipeIngredient {
   unite: string
 }
 
+export interface Unite {
+  id: string
+  nom: string
+}
+
 export async function fetchRecipes() {
   const res = await globalThis.fetch(`${API_BASE_URL}/recipes`)
   if (!res.ok) {
@@ -80,6 +85,16 @@ export async function searchIngredients(search: string): Promise<Ingredient[]> {
   const res = await globalThis.fetch(`${API_BASE_URL}/ingredients?${params.toString()}`)
   if (!res.ok) {
     throw new Error('Failed to fetch ingredients')
+  }
+  return res.json()
+}
+
+export async function searchUnites(search: string): Promise<Unite[]> {
+  const params = new globalThis.URLSearchParams()
+  params.set('search', search)
+  const res = await globalThis.fetch(`${API_BASE_URL}/unites?${params.toString()}`)
+  if (!res.ok) {
+    throw new Error('Failed to fetch unites')
   }
   return res.json()
 }

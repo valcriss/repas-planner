@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { searchIngredients } from '../api'
-import type { Ingredient } from '../api'
+import { searchIngredients, searchUnites } from '../api'
+import type { Ingredient, Unite } from '../api'
 
 interface IngredientData {
   id?: string
@@ -20,6 +20,7 @@ const emit = defineEmits<{
 
 const data = ref({ ...props.modelValue })
 const suggestions = ref<Ingredient[]>([])
+const unitSuggestions = ref<Unite[]>([])
 
 watch(() => props.modelValue, v => {
   data.value = { ...v }
@@ -42,11 +43,31 @@ watch(
   }
 )
 
+watch(
+  () => data.value.unite,
+  async (val) => {
+    if (!val || data.value.id) {
+      unitSuggestions.value = []
+      return
+    }
+    try {
+      unitSuggestions.value = await searchUnites(val)
+    } catch {
+      unitSuggestions.value = []
+    }
+  }
+)
+
 function pick(ing: Ingredient) {
   data.value.id = ing.id
   data.value.nom = ing.nom
   data.value.unite = ing.unite || ''
   suggestions.value = []
+}
+
+function pickUnit(u: Unite) {
+  data.value.unite = u.nom
+  unitSuggestions.value = []
 }
 </script>
 <template>
@@ -66,9 +87,26 @@ function pick(ing: Ingredient) {
         {{ s.nom }}
       </li>
     </ul>
-    <div class="flex space-x-2 mt-1">
+    <div class="flex space-x-2 mt-1 relative">
       <input v-model="data.quantite" class="border rounded p-1 w-20" placeholder="Qté" />
-      <input v-model="data.unite" :disabled="!!data.id" class="border rounded p-1 flex-1" placeholder="Unité" />
+      <div class="flex-1">
+        <input
+          v-model="data.unite"
+          :disabled="!!data.id"
+          class="border rounded p-1 w-full"
+          placeholder="Unité"
+        />
+        <ul v-if="unitSuggestions.length" class="border bg-white absolute left-20 right-0 z-10">
+          <li
+            v-for="u in unitSuggestions"
+            :key="u.id"
+            class="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+            @click="pickUnit(u)"
+          >
+            {{ u.nom }}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>

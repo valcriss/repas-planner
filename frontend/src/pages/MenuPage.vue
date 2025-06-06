@@ -19,7 +19,8 @@ const days = [
         class="bg-white rounded shadow p-4"
       >
         <h2 class="font-medium mb-2">{{ day }}</h2>
-        <p class="text-sm text-gray-600">Recipe placeholder</p>
+        <p class="text-sm text-gray-600">Lunch: Recipe placeholder</p>
+        <p class="text-sm text-gray-600">Dinner: Recipe placeholder</p>
       </div>
     </div>
   </div>

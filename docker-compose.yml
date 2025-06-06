@@ -8,7 +8,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
   app:
-    build: .
+    image: danielsilvestre37/repas-planner:latest
     ports:
       - "3000:3000"
     environment:

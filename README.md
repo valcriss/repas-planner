@@ -85,7 +85,14 @@ npm install
 ```
 
 ### Tests
-
 ```bash
 npm test
+```
+
+Code coverage for TypeScript sources is generated in `backend/coverage`.
+
+### Linting
+
+```bash
+npm run lint
 ```

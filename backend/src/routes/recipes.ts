@@ -120,12 +120,62 @@ router.post('/import', async (req: Request, res: Response, next: NextFunction) =
   const client = await pool.connect()
   try {
     await client.query('BEGIN')
-    for (const r of data.recipes) {
-      const { rows } = await client.query('SELECT 1 FROM recipes WHERE nom = $1', [r.nom])
-      if (rows.length === 0) {
-        await insertRecipe(client, r)
+
+    if (Array.isArray(data.ingredients) || Array.isArray(data.recipe_ingredients) || Array.isArray(data.unites)) {
+      if (Array.isArray(data.unites)) {
+        for (const u of data.unites) {
+          await client.query(
+            'INSERT INTO unites (id, nom) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING',
+            [u.id, u.nom]
+          )
+        }
+      }
+
+      if (Array.isArray(data.ingredients)) {
+        for (const ing of data.ingredients) {
+          await client.query(
+            'INSERT INTO ingredients (id, nom, unite_id) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING',
+            [ing.id, ing.nom, ing.unite_id || null]
+          )
+        }
+      }
+
+      for (const r of data.recipes) {
+        const { rows } = await client.query('SELECT 1 FROM recipes WHERE id = $1', [r.id])
+        if (rows.length === 0) {
+          await client.query(
+            `INSERT INTO recipes (id, nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [
+              r.id,
+              r.nom,
+              r.instructions || null,
+              r.ingredient_principal_id || null,
+              r.ingredient_secondaire_id || null,
+              r.image_url || null
+            ]
+          )
+        }
+      }
+
+      if (Array.isArray(data.recipe_ingredients)) {
+        for (const ri of data.recipe_ingredients) {
+          await client.query(
+            'INSERT INTO recipe_ingredients (id, recipe_id, ingredient_id, quantite, unite_id) ' +
+              'VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO NOTHING',
+            [ri.id, ri.recipe_id, ri.ingredient_id, ri.quantite, ri.unite_id || null]
+          )
+        }
+      }
+    } else {
+      for (const r of data.recipes) {
+        const { rows } = await client.query('SELECT 1 FROM recipes WHERE nom = $1', [r.nom])
+        if (rows.length === 0) {
+          await insertRecipe(client, r)
+        }
       }
     }
+
     await client.query('COMMIT')
     res.status(204).send()
   } catch (err) {

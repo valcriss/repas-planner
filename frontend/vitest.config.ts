@@ -9,7 +9,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html'],
       all: true,
-      include: ['src/router.ts', 'src/pages/RecipeDetailPage.vue']
+      include: ['src/router.ts', 'src/pages/RecipeDetailPage.vue', 'src/week.ts']
     }
   }
 })

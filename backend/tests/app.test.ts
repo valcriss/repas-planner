@@ -33,3 +33,14 @@ describe('GET /recipes/:id/ingredients', () => {
     expect(mockedQuery).toHaveBeenCalled();
   });
 });
+
+describe('GET /unites', () => {
+  it('searches units', async () => {
+    mockedQuery.mockResolvedValueOnce({ rows: [{ id: 'u1', nom: 'kg' }] });
+    const res = await request(app).get('/unites?search=k');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([{ id: 'u1', nom: 'kg' }]);
+    expect(mockedQuery).toHaveBeenCalled();
+  });
+});
+

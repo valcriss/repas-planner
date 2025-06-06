@@ -27,4 +27,12 @@ describe('RecipesPage', () => {
     expect(imgs[0].attributes('src')).toBe('img')
     expect(imgs[1].attributes('src')).not.toBe('img')
   })
+
+  it('opens import dialog', async () => {
+    ;(api.fetchRecipes as unknown as Mock).mockResolvedValue([])
+    const wrapper = await setup()
+    await flushPromises()
+    await wrapper.get('[data-test="import-btn"]').trigger('click')
+    expect(wrapper.find('input[type="file"]').exists()).toBe(true)
+  })
 })

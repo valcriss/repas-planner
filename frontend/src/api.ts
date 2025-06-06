@@ -163,3 +163,18 @@ export async function fetchShoppingList(week: string): Promise<ShoppingIngredien
   if (!res.ok) throw new Error('Failed to fetch shopping list')
   return res.json()
 }
+
+export async function exportRecipes() {
+  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/export`)
+  if (!res.ok) throw new Error('Failed to export recipes')
+  return res.json()
+}
+
+export async function importRecipes(data: unknown) {
+  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/import`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  if (!res.ok) throw new Error('Failed to import recipes')
+}

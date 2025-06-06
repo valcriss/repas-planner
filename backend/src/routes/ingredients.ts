@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { randomUUID } from 'crypto';
 import pool from '../db';
+import { findOrCreateUnite } from '../unite';
 
 const router = express.Router();
 
@@ -9,7 +10,12 @@ router.get('/', async (req: Request, res: Response, next: NextFunction): Promise
   const search = (req.query.search as string) || '';
   try {
     const { rows } = await pool.query(
-      'SELECT * FROM ingredients WHERE nom ILIKE $1 ORDER BY nom LIMIT 10',
+      `SELECT i.id, i.nom, u.nom AS unite
+       FROM ingredients i
+       LEFT JOIN unites u ON u.id = i.unite_id
+       WHERE i.nom ILIKE $1
+       ORDER BY i.nom
+       LIMIT 10`,
       [`%${search}%`]
     );
     res.json(rows);
@@ -26,14 +32,21 @@ router.post('/', async (req: Request, res: Response, next: NextFunction): Promis
     return;
   }
   const id = randomUUID();
+  const client = await pool.connect();
   try {
-    const { rows } = await pool.query(
-      'INSERT INTO ingredients (id, nom, unite) VALUES ($1, $2, $3) RETURNING *',
-      [id, nom, unite || null]
+    await client.query('BEGIN');
+    const uniteId = await findOrCreateUnite(client, unite);
+    await client.query(
+      'INSERT INTO ingredients (id, nom, unite_id) VALUES ($1, $2, $3)',
+      [id, nom, uniteId]
     );
-    res.status(201).json(rows[0]);
+    await client.query('COMMIT');
+    res.status(201).json({ id, nom, unite: unite || null });
   } catch (err) {
+    await client.query('ROLLBACK');
     next(err);
+  } finally {
+    client.release();
   }
 });
 

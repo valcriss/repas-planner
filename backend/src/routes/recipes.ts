@@ -31,7 +31,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction): Prom
 
 // POST /recipes - create a new recipe
 router.post('/', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { nom, instructions, ingredient_principal_id, ingredient_secondaire_id } = req.body;
+  const { nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url } = req.body;
   if (!nom || !ingredient_principal_id) {
     res.status(400).json({ error: 'Missing required fields' });
     return;
@@ -39,9 +39,9 @@ router.post('/', async (req: Request, res: Response, next: NextFunction): Promis
   const id = randomUUID();
   try {
     const { rows } = await pool.query(
-      `INSERT INTO recipes (id, nom, instructions, ingredient_principal_id, ingredient_secondaire_id)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [id, nom, instructions || null, ingredient_principal_id, ingredient_secondaire_id || null]
+      `INSERT INTO recipes (id, nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [id, nom, instructions || null, ingredient_principal_id, ingredient_secondaire_id || null, image_url || null]
     );
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -52,16 +52,16 @@ router.post('/', async (req: Request, res: Response, next: NextFunction): Promis
 // PUT /recipes/:id - update a recipe
 router.put('/:id', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
-  const { nom, instructions, ingredient_principal_id, ingredient_secondaire_id } = req.body;
+  const { nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url } = req.body;
   if (!nom || !ingredient_principal_id) {
     res.status(400).json({ error: 'Missing required fields' });
     return;
   }
   try {
     const { rows } = await pool.query(
-      `UPDATE recipes SET nom = $1, instructions = $2, ingredient_principal_id = $3, ingredient_secondaire_id = $4
-       WHERE id = $5 RETURNING *`,
-      [nom, instructions || null, ingredient_principal_id, ingredient_secondaire_id || null, id]
+      `UPDATE recipes SET nom = $1, instructions = $2, ingredient_principal_id = $3, ingredient_secondaire_id = $4, image_url = $5
+       WHERE id = $6 RETURNING *`,
+      [nom, instructions || null, ingredient_principal_id, ingredient_secondaire_id || null, image_url || null, id]
     );
     if (rows.length === 0) {
       res.status(404).json({ error: 'Recipe not found' });

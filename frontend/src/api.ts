@@ -150,3 +150,16 @@ export async function generateMenu(week: string, selection: Record<string, { dej
   if (!res.ok) throw new Error('Failed to generate menu')
   return res.json()
 }
+
+export interface ShoppingIngredient {
+  id: string
+  nom: string
+  quantite: string
+  unite: string | null
+}
+
+export async function fetchShoppingList(week: string): Promise<ShoppingIngredient[]> {
+  const res = await globalThis.fetch(`${API_BASE_URL}/menus/${week}/shopping-list`)
+  if (!res.ok) throw new Error('Failed to fetch shopping list')
+  return res.json()
+}

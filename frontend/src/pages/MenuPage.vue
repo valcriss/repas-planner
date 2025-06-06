@@ -2,8 +2,8 @@
 /* eslint-disable vue/singleline-html-element-content-newline, vue/max-attributes-per-line, vue/html-self-closing, vue/attributes-order */
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
-import { fetchMenu, generateMenu } from '../api'
-import type { MenuRecipe } from '../api'
+import { fetchMenu, generateMenu, fetchShoppingList } from '../api'
+import type { MenuRecipe, ShoppingIngredient } from '../api'
 import { weekRange, weekString } from '../week'
 
 const route = useRoute()
@@ -12,6 +12,8 @@ const week = ref<string>((route.query.week as string) || weekString(new Date()))
 const menu = ref<MenuRecipe[]>([])
 const showModal = ref(false)
 const selection = ref<Record<string, { dejeuner: boolean; diner: boolean }>>({})
+const showShopping = ref(false)
+const shopping = ref<ShoppingIngredient[]>([])
 
 const range = computed(() => {
   const { start, end } = weekRange(week.value)
@@ -56,15 +58,25 @@ async function gen() {
   load()
 }
 
+async function openShopping() {
+  try {
+    shopping.value = await fetchShoppingList(week.value)
+  } catch {
+    shopping.value = []
+  }
+  showShopping.value = true
+}
+
 onMounted(load)
 </script>
 <template>
   <div>
     <h1 class="text-2xl font-bold mb-4">Menu du {{ range }}</h1>
-    <div class="mb-2 space-x-2">
+    <div class="mb-2 flex space-x-2">
       <button class="px-2 py-1 bg-gray-200" @click="change(-1)">Semaine précédente</button>
       <button class="px-2 py-1 bg-gray-200" @click="change(1)">Semaine suivante</button>
       <button class="px-2 py-1 bg-blue-600 text-white" @click="openModal">Générer le menu</button>
+      <button class="ml-auto px-2 py-1 bg-green-600 text-white" @click="openShopping">Liste de course de la semaine</button>
     </div>
     <table class="w-full text-left">
       <thead>
@@ -122,6 +134,19 @@ onMounted(load)
         <div class="mt-2 space-x-2">
           <button class="px-2 py-1 bg-blue-600 text-white" @click="gen">Générer</button>
           <button class="px-2 py-1 bg-gray-200" @click="showModal=false">Annuler</button>
+        </div>
+      </div>
+    </div>
+    <div v-if="showShopping" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-white p-4">
+        <h2 class="text-lg font-bold mb-2">Liste de course</h2>
+        <ul class="list-disc list-inside">
+          <li v-for="ing in shopping" :key="ing.id">
+            {{ ing.nom }} : {{ ing.quantite }} {{ ing.unite }}
+          </li>
+        </ul>
+        <div class="mt-2 text-right">
+          <button class="px-2 py-1 bg-gray-200" @click="showShopping=false">Fermer</button>
         </div>
       </div>
     </div>

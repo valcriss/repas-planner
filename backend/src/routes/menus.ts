@@ -69,4 +69,26 @@ router.post('/:week/generate', async (req: Request, res: Response, next: NextFun
   }
 })
 
+router.get('/:week/shopping-list', async (req: Request, res: Response, next: NextFunction) => {
+  const { week } = req.params
+  try {
+    const { rows } = await pool.query(
+      `SELECT i.id, i.nom, u.nom AS unite,
+              SUM(COALESCE(ri.quantite::numeric,0))::text AS quantite
+       FROM menus m
+       JOIN menu_recipes mr ON mr.menu_id = m.id
+       JOIN recipe_ingredients ri ON ri.recipe_id = mr.recipe_id
+       JOIN ingredients i ON i.id = ri.ingredient_id
+       LEFT JOIN unites u ON u.id = ri.unite_id
+       WHERE m.semaine = $1
+       GROUP BY i.id, i.nom, u.nom
+       ORDER BY i.nom`,
+      [week]
+    )
+    res.json(rows)
+  } catch (err) {
+    next(err)
+  }
+})
+
 export default router

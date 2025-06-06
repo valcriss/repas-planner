@@ -2,10 +2,15 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { createRecipe } from '../api'
+import IngredientInput from '../components/IngredientInput.vue'
 
 const nom = ref('')
 const instructions = ref('')
 const ingredientPrincipalId = ref('')
+const imageUrl = ref('')
+const ingredients = ref([
+  { nom: '', quantite: '', unite: '' }
+])
 const router = useRouter()
 
 const submit = async () => {
@@ -13,12 +18,18 @@ const submit = async () => {
     await createRecipe({
       nom: nom.value,
       ingredient_principal_id: ingredientPrincipalId.value,
-      instructions: instructions.value || undefined
+      instructions: instructions.value || undefined,
+      image_url: imageUrl.value || undefined,
+      ingredients: ingredients.value
     })
     router.push('/recipes')
   } catch {
     // ignore error for now
   }
+}
+
+const addIngredient = () => {
+  ingredients.value.push({ nom: '', quantite: '', unite: '' })
 }
 </script>
 <template>
@@ -32,6 +43,19 @@ const submit = async () => {
       <div>
         <label class="block mb-1">Instructions</label>
         <textarea v-model="instructions" class="border rounded w-full p-2" />
+      </div>
+      <div>
+        <label class="block mb-1">Image URL</label>
+        <input v-model="imageUrl" class="border rounded w-full p-2" />
+      </div>
+      <div>
+        <label class="block mb-1">Ingrédients</label>
+        <IngredientInput
+          v-for="(ing, idx) in ingredients"
+          :key="idx"
+          v-model="ingredients[idx]"
+        />
+        <button type="button" @click="addIngredient" class="px-2 py-1 bg-gray-200 rounded">Ajouter un ingrédient</button>
       </div>
       <div>
         <label class="block mb-1">Ingredient principal ID</label>

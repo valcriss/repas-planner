@@ -6,6 +6,20 @@ export interface RecipePayload {
   instructions?: string
   ingredient_secondaire_id?: string
   image_url?: string
+  ingredients?: RecipeIngredientPayload[]
+}
+
+export interface RecipeIngredientPayload {
+  id?: string
+  nom: string
+  quantite: string
+  unite: string
+}
+
+export interface Ingredient {
+  id: string
+  nom: string
+  unite: string | null
 }
 
 export async function fetchRecipes() {
@@ -26,6 +40,16 @@ export async function createRecipe(payload: RecipePayload) {
   })
   if (!res.ok) {
     throw new Error('Failed to create recipe')
+  }
+  return res.json()
+}
+
+export async function searchIngredients(search: string): Promise<Ingredient[]> {
+  const params = new globalThis.URLSearchParams()
+  params.set('search', search)
+  const res = await globalThis.fetch(`${API_BASE_URL}/ingredients?${params.toString()}`)
+  if (!res.ok) {
+    throw new Error('Failed to fetch ingredients')
   }
   return res.json()
 }

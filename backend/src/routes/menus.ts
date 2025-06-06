@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express'
 import { randomUUID } from 'crypto'
 import pool from '../db'
-import { generateMenuEntries, Selection } from '../menu'
+import { generateMenuEntries, Selection, RecipeRow } from '../menu'
 
 const router = express.Router()
 
@@ -43,8 +43,15 @@ router.post('/:week/generate', async (req: Request, res: Response, next: NextFun
       menuId = rows[0].id
       await client.query('DELETE FROM menu_recipes WHERE menu_id = $1', [menuId])
     }
-    const { rows: recs } = await client.query('SELECT id, ingredient_principal_id, ingredient_secondaire_id FROM recipes')
-    const entries = generateMenuEntries(recs, selection)
+    const { rows: recs } = await client.query(
+      `SELECT r.id, r.ingredient_principal_id, r.ingredient_secondaire_id,
+              MAX(m.semaine) AS last_used
+       FROM recipes r
+       LEFT JOIN menu_recipes mr ON mr.recipe_id = r.id
+       LEFT JOIN menus m ON m.id = mr.menu_id
+       GROUP BY r.id`
+    )
+    const entries = generateMenuEntries(recs as RecipeRow[], selection)
     for (const e of entries) {
       if (!e.recipe_id) continue
       await client.query(

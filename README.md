@@ -21,7 +21,7 @@
 - **Migrations**: [`node-pg-migrate`](https://github.com/salsita/node-pg-migrate)
 - **Web Server**: Express
 - **Local Development**: `ts-node-dev`
-- **Frontend (planned)**: Vue.js + Tailwind CSS
+- **Frontend**: Vue.js + TypeScript + Tailwind CSS
 - **Deployment (planned)**: Docker
 
 ---
@@ -95,4 +95,19 @@ Code coverage for TypeScript sources is generated in `backend/coverage`.
 
 ```bash
 npm run lint
+```
+
+### Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+To run linting and tests for the frontend:
+
+```bash
+npm run lint
+npm test
 ```

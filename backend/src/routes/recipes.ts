@@ -189,27 +189,52 @@ router.put('/:id', async (req: Request, res: Response, next: NextFunction): Prom
 
     await client.query('DELETE FROM recipe_ingredients WHERE recipe_id = $1', [id]);
 
-    if (Array.isArray(ingredients)) {
-      for (const ing of ingredients) {
-        let ingredientId = ing.id;
-        const uniteId = await findOrCreateUnite(client, ing.unite);
-        if (!ingredientId) {
-          const newId = randomUUID();
-          const { rows: ingRows } = await client.query(
-            'INSERT INTO ingredients (id, nom, unite_id) VALUES ($1, $2, $3) RETURNING id',
-            [newId, ing.nom, uniteId]
+      if (Array.isArray(ingredients)) {
+        for (const ing of ingredients) {
+          let ingredientId = ing.id;
+          const uniteId = await findOrCreateUnite(client, ing.unite);
+          if (!ingredientId) {
+            const newId = randomUUID();
+            const { rows: ingRows } = await client.query(
+              'INSERT INTO ingredients (id, nom, unite_id) VALUES ($1, $2, $3) RETURNING id',
+              [newId, ing.nom, uniteId]
+            );
+            ingredientId = ingRows[0].id;
+          }
+          await client.query(
+            'INSERT INTO recipe_ingredients (id, recipe_id, ingredient_id, quantite, unite_id) VALUES ($1, $2, $3, $4, $5)',
+            [randomUUID(), id, ingredientId, ing.quantite, uniteId]
           );
-          ingredientId = ingRows[0].id;
         }
-        await client.query(
-          'INSERT INTO recipe_ingredients (id, recipe_id, ingredient_id, quantite, unite_id) VALUES ($1, $2, $3, $4, $5)',
-          [randomUUID(), id, ingredientId, ing.quantite, uniteId]
-        );
       }
-    }
 
-    await client.query('COMMIT');
-    res.json(rows[0]);
+      const { rows: removed } = await client.query(
+        `DELETE FROM ingredients i
+         WHERE NOT EXISTS (
+           SELECT 1 FROM recipes r
+           WHERE r.ingredient_principal_id = i.id
+              OR r.ingredient_secondaire_id = i.id
+         )
+         AND NOT EXISTS (
+           SELECT 1 FROM recipe_ingredients ri WHERE ri.ingredient_id = i.id
+         )
+         RETURNING unite_id`
+      );
+      for (const r of removed) {
+        const uId = r.unite_id as string | null;
+        if (uId) {
+          const { rows: refs } = await client.query(
+            'SELECT 1 FROM ingredients WHERE unite_id = $1 LIMIT 1',
+            [uId]
+          );
+          if (refs.length === 0) {
+            await client.query('DELETE FROM unites WHERE id = $1', [uId]);
+          }
+        }
+      }
+
+      await client.query('COMMIT');
+      res.json(rows[0]);
   } catch (err) {
     await client.query('ROLLBACK');
     next(err);

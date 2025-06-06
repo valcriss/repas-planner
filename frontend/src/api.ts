@@ -121,3 +121,31 @@ export async function searchUnites(search: string): Promise<Unite[]> {
   }
   return res.json()
 }
+
+export interface MenuRecipe {
+  jour: string
+  moment: 'dejeuner' | 'diner'
+  recipe_id: string | null
+}
+
+export interface Menu {
+  id: string | null
+  semaine: string
+  recettes: MenuRecipe[]
+}
+
+export async function fetchMenu(week: string): Promise<Menu> {
+  const res = await globalThis.fetch(`${API_BASE_URL}/menus/${week}`)
+  if (!res.ok) throw new Error('Failed to fetch menu')
+  return res.json()
+}
+
+export async function generateMenu(week: string, selection: Record<string, { dejeuner: boolean; diner: boolean }>) {
+  const res = await globalThis.fetch(`${API_BASE_URL}/menus/${week}/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ selection })
+  })
+  if (!res.ok) throw new Error('Failed to generate menu')
+  return res.json()
+}

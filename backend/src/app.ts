@@ -4,6 +4,7 @@ import cors from 'cors';
 import recipeRoutes from './routes/recipes';
 import ingredientRoutes from './routes/ingredients';
 import uniteRoutes from './routes/unites';
+import menuRoutes from './routes/menus';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(cors());
 app.use('/recipes', recipeRoutes);
 app.use('/ingredients', ingredientRoutes);
 app.use('/unites', uniteRoutes);
+app.use('/menus', menuRoutes);
 
 app.get('/', (req, res) => {
   res.send('Repas Planner API');

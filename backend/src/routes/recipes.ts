@@ -71,8 +71,8 @@ router.post('/', async (req: Request, res: Response, next: NextFunction): Promis
     }
 
     const { rows } = await client.query(
-      `INSERT INTO recipes (id, nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url)`,
-      `       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      `INSERT INTO recipes (id, nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [id, nom, instructions || null, principalId, ingredient_secondaire_id || null, image_url || null]
     );
 

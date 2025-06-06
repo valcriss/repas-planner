@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /* eslint-disable vue/singleline-html-element-content-newline, vue/max-attributes-per-line, vue/html-self-closing, vue/attributes-order */
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { fetchMenu, generateMenu } from '../api'
 import type { MenuRecipe } from '../api'
 import { weekRange, weekString } from '../week'
@@ -77,8 +77,26 @@ onMounted(load)
       <tbody>
         <tr v-for="day in ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche']" :key="day">
           <td class="capitalize">{{ day }}</td>
-          <td>{{ menu.find(m => m.jour === day && m.moment === 'dejeuner')?.recipe_id || '-' }}</td>
-          <td>{{ menu.find(m => m.jour === day && m.moment === 'diner')?.recipe_id || '-' }}</td>
+          <td>
+            <RouterLink
+              v-if="menu.find(m => m.jour === day && m.moment === 'dejeuner')?.recipe_id"
+              :to="`/recipes/${menu.find(m => m.jour === day && m.moment === 'dejeuner')!.recipe_id}`"
+              class="text-blue-600"
+            >
+              {{ menu.find(m => m.jour === day && m.moment === 'dejeuner')!.recipe_nom }}
+            </RouterLink>
+            <span v-else>-</span>
+          </td>
+          <td>
+            <RouterLink
+              v-if="menu.find(m => m.jour === day && m.moment === 'diner')?.recipe_id"
+              :to="`/recipes/${menu.find(m => m.jour === day && m.moment === 'diner')!.recipe_id}`"
+              class="text-blue-600"
+            >
+              {{ menu.find(m => m.jour === day && m.moment === 'diner')!.recipe_nom }}
+            </RouterLink>
+            <span v-else>-</span>
+          </td>
         </tr>
       </tbody>
     </table>

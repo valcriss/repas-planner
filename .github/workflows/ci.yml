@@ -14,16 +14,7 @@ jobs:
       - name: 🧾 Checkout du code
         uses: actions/checkout@v3
 
-      - id: changes
-        name: 🗒️ Detect TS changes
-        uses: dorny/paths-filter@v2
-        with:
-          filters: |
-            ts:
-              - '**/*.ts'
-
       - name: 🟢 Setup Node.js
-        if: steps.changes.outputs.ts == 'true'
         uses: actions/setup-node@v3
         with:
           node-version: 20
@@ -33,46 +24,36 @@ jobs:
             frontend/package-lock.json
 
       - name: 📦 Installation des dépendances Backend
-        if: steps.changes.outputs.ts == 'true'
         run: cd backend && npm ci
 
       - name: 📦 Installation des dépendances Frontend
-        if: steps.changes.outputs.ts == 'true'
         run: cd frontend && npm ci
 
       - name: 🔍 Lint Backend
-        if: steps.changes.outputs.ts == 'true'
         run: cd backend && npm run lint
 
       - name: 🔍 Lint Frontend
-        if: steps.changes.outputs.ts == 'true'
         run: cd frontend && npm run lint
 
       - name: 🧪 Tests + Coverage Backend
-        if: steps.changes.outputs.ts == 'true'
         run: cd backend && npm run test
 
       - name: 🧪 Tests + Coverage Frontend
-        if: steps.changes.outputs.ts == 'true'
         run: cd frontend && npm run test
 
       - name: 📽 Build Backend
-        if: steps.changes.outputs.ts == 'true'
         run: cd backend && npm run build
 
       - name: 📽 Build Frontend
-        if: steps.changes.outputs.ts == 'true'
         run: cd frontend && npm run build
 
       - name: 📁 Upload du rapport HTML de couverture Backend
-        if: steps.changes.outputs.ts == 'true'
         uses: actions/upload-artifact@v4.6.2
         with:
           name: coverage-report-backend
           path: backend/coverage/lcov-report
 
       - name: 📁 Upload du rapport HTML de couverture Frontend
-        if: steps.changes.outputs.ts == 'true'
         uses: actions/upload-artifact@v4.6.2
         with:
           name: coverage-report-frontend

@@ -1,8 +1,26 @@
 <script setup lang="ts">
+const days = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday'
+]
 </script>
 <template>
-  <div class="p-4">
+  <div>
     <h1 class="text-2xl font-bold mb-4">Weekly Menu</h1>
-    <p>Menu will appear here.</p>
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div
+        v-for="day in days"
+        :key="day"
+        class="bg-white rounded shadow p-4"
+      >
+        <h2 class="font-medium mb-2">{{ day }}</h2>
+        <p class="text-sm text-gray-600">Recipe placeholder</p>
+      </div>
+    </div>
   </div>
 </template>

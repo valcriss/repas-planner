@@ -14,7 +14,13 @@ router.get('/:week', async (req: Request, res: Response, next: NextFunction) => 
       return
     }
     const menuId = rows[0].id as string
-    const { rows: recs } = await pool.query('SELECT jour, moment, recipe_id FROM menu_recipes WHERE menu_id = $1', [menuId])
+    const { rows: recs } = await pool.query(
+      `SELECT mr.jour, mr.moment, mr.recipe_id, r.nom AS recipe_nom
+       FROM menu_recipes mr
+       LEFT JOIN recipes r ON r.id = mr.recipe_id
+       WHERE mr.menu_id = $1`,
+      [menuId]
+    )
     res.json({ id: menuId, semaine: week, recettes: recs })
   } catch (err) {
     next(err)
@@ -41,10 +47,20 @@ router.post('/:week/generate', async (req: Request, res: Response, next: NextFun
     const entries = generateMenuEntries(recs, selection)
     for (const e of entries) {
       if (!e.recipe_id) continue
-      await client.query('INSERT INTO menu_recipes(id, menu_id, jour, moment, recipe_id) VALUES ($1,$2,$3,$4,$5)', [randomUUID(), menuId, e.jour, e.moment, e.recipe_id])
+      await client.query(
+        'INSERT INTO menu_recipes(id, menu_id, jour, moment, recipe_id) VALUES ($1,$2,$3,$4,$5)',
+        [randomUUID(), menuId, e.jour, e.moment, e.recipe_id]
+      )
     }
     await client.query('COMMIT')
-    res.json({ id: menuId, semaine: week, recettes: entries })
+    const { rows: recsWithNames } = await client.query(
+      `SELECT mr.jour, mr.moment, mr.recipe_id, r.nom AS recipe_nom
+       FROM menu_recipes mr
+       LEFT JOIN recipes r ON r.id = mr.recipe_id
+       WHERE mr.menu_id = $1`,
+      [menuId]
+    )
+    res.json({ id: menuId, semaine: week, recettes: recsWithNames })
   } catch (err) {
     await client.query('ROLLBACK')
     next(err)

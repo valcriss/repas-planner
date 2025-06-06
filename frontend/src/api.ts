@@ -126,6 +126,7 @@ export interface MenuRecipe {
   jour: string
   moment: 'dejeuner' | 'diner'
   recipe_id: string | null
+  recipe_nom: string | null
 }
 
 export interface Menu {

@@ -32,6 +32,7 @@
 - Database schema includes:
   - `ingredients`
   - `recipes`
+    - optional `image_url` field
   - `recipe_ingredients`
   - `menus`
   - `menu_recipes`

@@ -16,7 +16,8 @@ export interface MenuEntry {
 }
 
 export function generateMenuEntries(recipes: RecipeRow[], selection: Selection): MenuEntry[] {
-  const used = new Set<string>()
+  const usedMain = new Set<string>()
+  const usedSecondary = new Map<string, number>()
   const result: MenuEntry[] = []
   const pool = recipes
     .slice()
@@ -32,14 +33,18 @@ export function generateMenuEntries(recipes: RecipeRow[], selection: Selection):
       const idx = pool.findIndex(r => {
         const a = r.ingredient_principal_id
         const b = r.ingredient_secondaire_id
-        return (!a || !used.has(a)) && (!b || !used.has(b))
+        const count = b ? usedSecondary.get(b) ?? 0 : 0
+        return (!a || !usedMain.has(a)) && (!b || count < 2)
       })
       if (idx === -1) {
         result.push({ jour, moment, recipe_id: null })
       } else {
         const r = pool.splice(idx, 1)[0]
-        if (r.ingredient_principal_id) used.add(r.ingredient_principal_id)
-        if (r.ingredient_secondaire_id) used.add(r.ingredient_secondaire_id)
+        if (r.ingredient_principal_id) usedMain.add(r.ingredient_principal_id)
+        if (r.ingredient_secondaire_id) {
+          const count = usedSecondary.get(r.ingredient_secondaire_id) ?? 0
+          usedSecondary.set(r.ingredient_secondaire_id, count + 1)
+        }
         result.push({ jour, moment, recipe_id: r.id })
       }
     }

@@ -39,19 +39,43 @@ router.post('/', async (req: Request, res: Response, next: NextFunction): Promis
     image_url,
     ingredients
   } = req.body;
-  if (!nom || !ingredient_principal_id) {
+
+  if (!nom) {
     res.status(400).json({ error: 'Missing required fields' });
     return;
   }
+  let principalId = ingredient_principal_id as string | undefined;
   const id = randomUUID();
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+
+    if (!principalId) {
+      if (!Array.isArray(ingredients) || ingredients.length === 0) {
+        res.status(400).json({ error: 'Missing required fields' });
+        await client.query('ROLLBACK');
+        return;
+      }
+      let firstIng = ingredients[0];
+      let firstId = firstIng.id as string | undefined;
+      if (!firstId) {
+        const newId = randomUUID();
+        const { rows: ingRows } = await client.query(
+          'INSERT INTO ingredients (id, nom, unite) VALUES ($1, $2, $3) RETURNING id',
+          [newId, firstIng.nom, firstIng.unite]
+        );
+        firstId = ingRows[0].id;
+      }
+      principalId = firstId;
+      ingredients[0].id = firstId;
+    }
+
     const { rows } = await client.query(
-      `INSERT INTO recipes (id, nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [id, nom, instructions || null, ingredient_principal_id, ingredient_secondaire_id || null, image_url || null]
+      `INSERT INTO recipes (id, nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url)`,
+      `       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [id, nom, instructions || null, principalId, ingredient_secondaire_id || null, image_url || null]
     );
+
     if (Array.isArray(ingredients)) {
       for (const ing of ingredients) {
         let ingredientId = ing.id;

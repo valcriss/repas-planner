@@ -27,6 +27,8 @@ export interface Recipe {
   nom: string
   instructions: string | null
   image_url: string | null
+  ingredient_principal_id: string | null
+  ingredient_secondaire_id: string | null
 }
 
 export interface RecipeIngredient {
@@ -77,6 +79,27 @@ export async function createRecipe(payload: RecipePayload) {
     throw new Error('Failed to create recipe')
   }
   return res.json()
+}
+
+export async function updateRecipe(id: string, payload: RecipePayload) {
+  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  if (!res.ok) {
+    throw new Error('Failed to update recipe')
+  }
+  return res.json()
+}
+
+export async function deleteRecipe(id: string) {
+  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/${id}`, {
+    method: 'DELETE'
+  })
+  if (!res.ok) {
+    throw new Error('Failed to delete recipe')
+  }
 }
 
 export async function searchIngredients(search: string): Promise<Ingredient[]> {

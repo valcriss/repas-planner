@@ -48,4 +48,22 @@ describe('POST /recipes/import', () => {
     const res = await request(app).post('/api/recipes/import').send({})
     expect(res.status).toBe(400)
   })
+
+  it('imports export data', async () => {
+    const q = vi.fn()
+    mockedConnect.mockResolvedValue({ query: q, release: vi.fn() })
+    q.mockResolvedValue({ rows: [] })
+    const res = await request(app).post('/api/recipes/import').send({
+      unites: [{ id: 'u1', nom: 'kg' }],
+      ingredients: [{ id: 'i1', nom: 'Ing', unite_id: 'u1' }],
+      recipes: [{ id: 'r1', nom: 'Rec', ingredient_principal_id: 'i1' }],
+      recipe_ingredients: [{ id: 'ri1', recipe_id: 'r1', ingredient_id: 'i1', quantite: '1', unite_id: 'u1' }]
+    })
+    expect(res.status).toBe(204)
+    const calls = q.mock.calls.map(c => c[0])
+    expect(calls.some(s => s.includes('INSERT INTO unites'))).toBe(true)
+    expect(calls.some(s => s.includes('INSERT INTO ingredients'))).toBe(true)
+    expect(calls.some(s => s.includes('INSERT INTO recipes'))).toBe(true)
+    expect(calls.some(s => s.includes('INSERT INTO recipe_ingredients'))).toBe(true)
+  })
 })

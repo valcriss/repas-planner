@@ -44,3 +44,18 @@ describe('GET /unites', () => {
   });
 });
 
+describe('GET /menus/:week/shopping-list', () => {
+  it('returns aggregated ingredients', async () => {
+    mockedQuery.mockResolvedValueOnce({ rows: [{ id: 'i1', nom: 'Beurre', quantite: '700', unite: 'g' }] });
+    const res = await request(app).get('/menus/2024-W01/shopping-list');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([{ id: 'i1', nom: 'Beurre', quantite: '700', unite: 'g' }]);
+  });
+
+  it('handles errors', async () => {
+    mockedQuery.mockRejectedValueOnce(new Error('fail'));
+    const res = await request(app).get('/menus/2024-W01/shopping-list');
+    expect(res.status).toBe(500);
+  });
+});
+

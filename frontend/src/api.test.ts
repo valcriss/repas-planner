@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fetchShoppingList, exportRecipes, importRecipes } from './api'
+import { fetchShoppingList, exportRecipes, importRecipes, getApiBaseUrl } from './api'
 
 const data = [{ id: 'i1', nom: 'Beurre', quantite: '700', unite: 'g' }]
 
@@ -31,5 +31,16 @@ describe('exportRecipes/importRecipes', () => {
     const call = (globalThis.fetch as unknown as vi.Mock).mock.calls[1]
     expect(call[0]).toBe('http://localhost:3000/api/recipes/import')
     expect(call[1].method).toBe('POST')
+  })
+})
+
+describe('getApiBaseUrl', () => {
+  it('returns dev url when PROD is false', () => {
+    expect(getApiBaseUrl({ PROD: false })).toBe('http://localhost:3000/api')
+  })
+
+  it('returns location url when PROD is true', () => {
+    vi.stubGlobal('location', { origin: 'https://site.example' })
+    expect(getApiBaseUrl({ PROD: true })).toBe('https://site.example/api')
   })
 })

@@ -1,4 +1,8 @@
-export const API_BASE_URL = 'http://localhost:3000/api'
+export function getApiBaseUrl(env: { PROD: boolean } = import.meta.env) {
+  return env.PROD ? `${globalThis.location.origin}/api` : 'http://localhost:3000/api'
+}
+
+export const API_BASE_URL = getApiBaseUrl()
 
 export interface RecipePayload {
   nom: string

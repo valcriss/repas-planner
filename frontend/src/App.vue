@@ -14,7 +14,7 @@ import { RouterLink, RouterView } from 'vue-router'
             to="/recipes"
             class="hover:underline"
           >
-            Recipes
+            Recettes
           </RouterLink>
           <RouterLink
             to="/menu"

@@ -27,7 +27,7 @@ done
 
 printf 'Database ready. Running migrations...\n'
 
-npx node-pg-migrate
+npx node-pg-migrate up
 
 printf 'Starting application...\n'
 printf 'Exec command: %s\n' "$*"

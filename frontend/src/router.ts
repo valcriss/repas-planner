@@ -8,6 +8,7 @@ export const routes = [
   { path: '/', redirect: '/recipes' },
   { path: '/recipes', component: RecipesPage },
   { path: '/recipes/:id', component: RecipeDetailPage },
+  { path: '/recipes/:id/edit', component: AddRecipePage },
   { path: '/recipes/add', component: AddRecipePage },
   { path: '/menu', component: MenuPage }
 ]

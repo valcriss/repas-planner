@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
-import { fetchRecipe, fetchRecipeIngredients } from '../api'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { fetchRecipe, fetchRecipeIngredients, deleteRecipe } from '../api'
 import type { Recipe, RecipeIngredient } from '../api'
 
 const route = useRoute()
+const router = useRouter()
 const recipe = ref<Recipe | null>(null)
 const ingredients = ref<RecipeIngredient[]>([])
 
@@ -17,6 +18,17 @@ onMounted(async () => {
     // ignore for now
   }
 })
+
+async function remove() {
+  if (!recipe.value) return
+  if (!globalThis.confirm('Supprimer cette recette ?')) return
+  try {
+    await deleteRecipe(recipe.value.id)
+    router.push('/recipes')
+  } catch {
+    // ignore
+  }
+}
 </script>
 <template>
   <div v-if="recipe" class="max-w-2xl mx-auto">
@@ -31,5 +43,16 @@ onMounted(async () => {
     </ul>
     <h2 class="text-xl font-semibold mb-2">Description</h2>
     <p class="whitespace-pre-line">{{ recipe.instructions }}</p>
+    <div class="mt-4 space-x-2">
+      <RouterLink
+        :to="`/recipes/${recipe.id}/edit`"
+        class="px-3 py-1 bg-blue-600 text-white rounded"
+      >Éditer</RouterLink>
+      <button
+        type="button"
+        @click="remove"
+        class="px-3 py-1 bg-red-600 text-white rounded"
+      >Supprimer</button>
+    </div>
   </div>
 </template>

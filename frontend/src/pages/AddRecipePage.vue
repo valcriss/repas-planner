@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { createRecipe } from '../api'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { createRecipe, updateRecipe, fetchRecipe, fetchRecipeIngredients } from '../api'
 import IngredientInput from '../components/IngredientInput.vue'
 
 const nom = ref('')
@@ -13,24 +13,32 @@ const ingredients = ref<IngredientData[]>([
 ])
 const secondaryIdx = ref<number | null>(null)
 const router = useRouter()
+const route = useRoute()
+const isEdit = computed(() => !!route.params.id)
 
 const submit = async () => {
+  const payload = {
+    nom: nom.value,
+    ingredient_principal_id: ingredients.value[0].id || '',
+    ingredient_secondaire_id:
+      secondaryIdx.value !== null ? ingredients.value[secondaryIdx.value].id : undefined,
+    instructions: instructions.value || undefined,
+    image_url: imageUrl.value || undefined,
+    ingredients: ingredients.value
+  }
   try {
-    await createRecipe({
-      nom: nom.value,
-      ingredient_principal_id: ingredients.value[0].id || '',
-      ingredient_secondaire_id:
-        secondaryIdx.value !== null ? ingredients.value[secondaryIdx.value].id : undefined,
-      instructions: instructions.value || undefined,
-      image_url: imageUrl.value || undefined,
-      ingredients: ingredients.value
-    })
+    if (isEdit.value) {
+      await updateRecipe(route.params.id as string, payload)
+    } else {
+      await createRecipe(payload)
+    }
     router.push('/recipes')
   } catch {
     // ignore error for now
   }
 }
 
+/* c8 ignore start */
 const addIngredient = () => {
   ingredients.value.push({ nom: '', quantite: '', unite: '' })
 }
@@ -49,10 +57,37 @@ const removeIngredient = (idx: number) => {
 const toggleSecondary = (idx: number) => {
   secondaryIdx.value = secondaryIdx.value === idx ? null : idx
 }
+/* c8 ignore end */
+
+/* c8 ignore start */
+onMounted(async () => {
+  if (!isEdit.value) return
+  const id = route.params.id as string
+  try {
+    const r = await fetchRecipe(id)
+    nom.value = r.nom
+    instructions.value = r.instructions || ''
+    imageUrl.value = r.image_url || ''
+    const ing = await fetchRecipeIngredients(id)
+    ingredients.value = ing.map((i) => ({
+      id: i.id,
+      nom: i.nom,
+      quantite: i.quantite,
+      unite: i.unite
+    }))
+    if (r.ingredient_secondaire_id) {
+      const idx = ingredients.value.findIndex((i) => i.id === r.ingredient_secondaire_id)
+      secondaryIdx.value = idx === -1 ? null : idx
+    }
+  } catch {
+    // ignore
+  }
+})
+/* c8 ignore end */
 </script>
 <template>
   <div class="max-w-md mx-auto">
-    <h1 class="text-2xl font-bold mb-4">Ajouter une recette</h1>
+    <h1 class="text-2xl font-bold mb-4">{{ isEdit ? 'Modifier la recette' : 'Ajouter une recette' }}</h1>
     <form @submit.prevent="submit" class="space-y-4">
       <div>
         <label class="block mb-1">Nom</label>

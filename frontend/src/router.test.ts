@@ -6,6 +6,7 @@ describe('router', () => {
     const paths = routes.map(r => r.path)
     expect(paths).toContain('/recipes')
     expect(paths).toContain('/recipes/:id')
+    expect(paths).toContain('/recipes/:id/edit')
     expect(paths).toContain('/recipes/add')
     expect(paths).toContain('/menu')
   })

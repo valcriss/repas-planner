@@ -22,10 +22,40 @@ export interface Ingredient {
   unite: string | null
 }
 
+export interface Recipe {
+  id: string
+  nom: string
+  instructions: string | null
+  image_url: string | null
+}
+
+export interface RecipeIngredient {
+  id: string
+  nom: string
+  quantite: string
+  unite: string
+}
+
 export async function fetchRecipes() {
   const res = await globalThis.fetch(`${API_BASE_URL}/recipes`)
   if (!res.ok) {
     throw new Error('Failed to fetch recipes')
+  }
+  return res.json()
+}
+
+export async function fetchRecipe(id: string): Promise<Recipe> {
+  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/${id}`)
+  if (!res.ok) {
+    throw new Error('Failed to fetch recipe')
+  }
+  return res.json()
+}
+
+export async function fetchRecipeIngredients(id: string): Promise<RecipeIngredient[]> {
+  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/${id}/ingredients`)
+  if (!res.ok) {
+    throw new Error('Failed to fetch ingredients')
   }
   return res.json()
 }

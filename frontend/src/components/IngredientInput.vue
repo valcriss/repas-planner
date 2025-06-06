@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { searchIngredients, Ingredient } from '../api'
+import { searchIngredients } from '../api'
+import type { Ingredient } from '../api'
 
 interface IngredientData {
   id?: string

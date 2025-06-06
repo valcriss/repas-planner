@@ -7,7 +7,8 @@ import IngredientInput from '../components/IngredientInput.vue'
 const nom = ref('')
 const instructions = ref('')
 const imageUrl = ref('')
-const ingredients = ref([
+interface IngredientData { id?: string; nom: string; quantite: string; unite: string }
+const ingredients = ref<IngredientData[]>([
   { nom: '', quantite: '', unite: '' }
 ])
 const secondaryIdx = ref<number | null>(null)
@@ -67,7 +68,7 @@ const toggleSecondary = (idx: number) => {
       </div>
       <div>
         <label class="block mb-1">Ingrédients</label>
-        <div v-for="(ing, idx) in ingredients" :key="idx" class="mb-2">
+        <div v-for="(_, idx) in ingredients" :key="idx" class="mb-2">
           <IngredientInput v-model="ingredients[idx]" />
           <p v-if="idx === 0" class="text-sm text-gray-500">Ingrédient principal de la recette</p>
           <div v-if="idx > 0" class="flex items-center space-x-2">

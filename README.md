@@ -1,114 +1,81 @@
-# 🍽️ Repas Planner
+# 🍽️ Menu Planner
 
-**Repas Planner** is a personal tool designed to simplify weekly meal planning and reduce the mental load associated with organizing meals and grocery shopping.
+## Overview
+Menu Planner is a little helper that takes the pain out of figuring out what to eat every week. It manages your recipes, juggles ingredients and spits out a shopping list so you can focus on more important things – like eating.
 
-## 🎯 Project Goals
+## Why Menu Planner?
+Spending every Sunday night staring at an empty calendar wondering what to cook? Same here. This tool was born to cut down the mental load of meal planning, add variety to your diet and keep you from getting stuck in a pasta-every-night rut.
 
-- Allow creation of a recipe list with ingredients (quantity + unit).
-- Assign one **main ingredient** (mandatory) and one **secondary ingredient** (optional) per recipe.
-- Automatically generate a **weekly menu** that:
-  - Avoids repeating any main or secondary ingredient within the same week.
-  - Takes past menus into account to improve variety.
-- Automatically generate a **shopping list** based on the weekly menu.
-- Help reduce food waste and improve grocery budgeting.
+## Key Features
+- Create recipes with ingredients (quantity + unit)
+- Mark a main and optional secondary ingredient for each recipe
+- Generate a weekly menu without repeating main or secondary ingredients
+- Take past menus into account to maximize variety
+- Produce a shopping list based on the week's plan
 
----
+## How It Works
+The backend runs on **Node.js** with **TypeScript**, using **Express** and **pg** to connect to **PostgreSQL**. Migrations are handled by `node-pg-migrate` and development uses `ts-node-dev` for hot reloading. The frontend is built with **Vue.js**, TypeScript and Tailwind CSS. Everything can be packaged in **Docker** for easy deployment.
 
-## 🛠️ Tech Stack
+## Project Structure
+```
+backend/   # Node.js API and database migrations
+frontend/  # Vue application
+.github/   # CI workflows
+Dockerfile # Build container image
+```
+The root `docker-compose.yml` spins up the production app while `backend/docker-compose.dev.yml` provides a handy PostgreSQL instance for local development.
 
-- **Backend**: Node.js + TypeScript (CommonJS)
-- **Database**: PostgreSQL
-- **Migrations**: [`node-pg-migrate`](https://github.com/salsita/node-pg-migrate)
-- **Web Server**: Express
-- **Local Development**: `ts-node-dev`
-- **Frontend**: Vue.js + TypeScript + Tailwind CSS
-- **Deployment (planned)**: Docker
-
----
-
-## ✅ Features Implemented
-
-### Database
-- Database schema includes:
-  - `ingredients`
-  - `recipes`
-    - optional `image_url` field
-  - `recipe_ingredients`
-  - `menus`
-  - `menu_recipes` (stores one row per day and meal: `dejeuner` or `diner`)
-- Schema managed using `node-pg-migrate`
-- Environment file `.env` used for PostgreSQL connection
-
-### Backend
-- Express server up and running
-- Basic routes implemented (`GET /recipes`, `POST /recipes`)
-- Development run using `ts-node-dev`
-
----
-
-## 🧩 Features To Be Implemented
-
-### Backend
-- 🔲 Connect to PostgreSQL using `pg`
-- 🔲 Full read/write support for:
-  - Recipe creation with ingredients
-  - Recipe listing
-  - Weekly menu creation and retrieval
-- 🔲 Automatic weekly menu generation with constraints
-- 🔲 Grocery list generation from weekly menu
-
-### Frontend (to be developed)
-- 🔲 Responsive UI with Vue.js
-- 🔲 Recipe editor
-- 🔲 Weekly menu display and editing
-- 🔲 Shopping list display
-- 🔲 History view of previous weeks
-
-### Miscellaneous
-- 🔲 Docker support for production
-- 🔲 Simple local authentication (optional)
-- 🔲 PDF export/printing of menu and shopping list (optional)
-
----
-
-## ▶️ Getting Started
-
-### Requirements
-
-- Node.js ≥ 20
-- PostgreSQL ≥ 13
-
-### Installation
-
+## Deployment
+Want to try it out? Clone the repo and run:
+```yaml
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: repas
+      POSTGRES_PASSWORD: repas
+      POSTGRES_DB: repas
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  app:
+    image: danielsilvestre37/repas-planner:latest
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://repas:repas@db:5432/repas
+    depends_on:
+      - db
+volumes:
+  db-data:
+```
+Then simply run:
 ```bash
-cd backend
-npm install
+docker compose up -d
+```
+And you’re ready to get cooking (figuratively and literally).
+
+## Development
+Backend commands:
+- `npm run dev` – run the server with hot reload
+- `npm run build` – compile TypeScript
+- `npm run lint` – run ESLint
+- `npm run test` – run unit tests with coverage
+- `npm run migrate:create` – create a new database migration
+- `npm run migrate:up`/`npm run migrate:down` – apply or revert migrations
+
+Frontend commands:
+- `npm run dev` – start the Vite dev server
+- `npm run build` – build for production
+- `npm run lint` – run ESLint
+- `npm run test` – run unit tests with coverage
+
+For local development, start PostgreSQL with:
+```bash
+docker compose -f backend/docker-compose.dev.yml up -d
 ```
 
-### Tests
-```bash
-npm test
-```
+## License
+Menu Planner is released under the [MIT License](LICENSE).
 
-Code coverage for TypeScript sources is generated in `backend/coverage`.
-
-### Linting
-
-```bash
-npm run lint
-```
-
-### Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-To run linting and tests for the frontend:
-
-```bash
-npm run lint
-npm test
-```
+## Author
+Maintained with love (and plenty of snacks) by [@valcriss](https://github.com/valcriss).

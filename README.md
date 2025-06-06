@@ -80,4 +80,12 @@
 ### Installation
 
 ```bash
+cd backend
 npm install
+```
+
+### Tests
+
+```bash
+npm test
+```

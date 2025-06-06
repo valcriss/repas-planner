@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: repas
+      POSTGRES_PASSWORD: repas
+      POSTGRES_DB: repas
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://repas:repas@db:5432/repas
+    depends_on:
+      - db
+volumes:
+  db-data:
+

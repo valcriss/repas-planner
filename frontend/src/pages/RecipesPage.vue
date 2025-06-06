@@ -50,7 +50,7 @@ onMounted(async () => {
   <div>
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-bold">
-        Recipes
+        Recettes
       </h1>
       <div class="flex gap-2">
         <RouterLink
@@ -64,7 +64,7 @@ onMounted(async () => {
           class="px-3 py-1 bg-green-600 text-white rounded"
           @click="showImport = true"
         >
-          Import/Export
+          Importer/Exporter
         </button>
       </div>
     </div>
@@ -77,7 +77,7 @@ onMounted(async () => {
       >
         <img
           :src="recipe.image_url || placeholderImg"
-          alt="Recipe image"
+          alt="Image de la recette"
           class="w-full h-32 object-cover rounded mb-2"
         >
         <h2 class="font-medium text-lg mb-1">

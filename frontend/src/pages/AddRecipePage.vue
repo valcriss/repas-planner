@@ -110,7 +110,7 @@ onMounted(async () => {
         />
       </div>
       <div>
-        <label class="block mb-1">Image URL</label>
+        <label class="block mb-1">URL de l'image</label>
         <input
           v-model="imageUrl"
           class="border rounded w-full p-2"

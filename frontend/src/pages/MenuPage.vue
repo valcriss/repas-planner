@@ -2,12 +2,14 @@
 /* eslint-disable vue/singleline-html-element-content-newline, vue/max-attributes-per-line, vue/html-self-closing, vue/attributes-order */
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { fetchMenu, generateMenu, fetchShoppingList } from '../api'
 import type { MenuRecipe, ShoppingIngredient } from '../api'
 import { weekRange, weekString } from '../week'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const week = ref<string>((route.query.week as string) || weekString(new Date()))
 const menu = ref<MenuRecipe[]>([])
 const showModal = ref(false)
@@ -18,7 +20,7 @@ const shopping = ref<ShoppingIngredient[]>([])
 const range = computed(() => {
   const { start, end } = weekRange(week.value)
   const fmt = (d: Date) => d.toISOString().slice(0, 10)
-  return `${fmt(start)} au ${fmt(end)}`
+  return `${fmt(start)} ${t('common.to')} ${fmt(end)}`
 })
 
 async function load() {
@@ -71,24 +73,24 @@ onMounted(load)
 </script>
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-4">Menu du {{ range }}</h1>
+    <h1 class="text-2xl font-bold mb-4">{{ $t('menuPage.title', { range }) }}</h1>
     <div class="mb-2 flex space-x-2">
-      <button class="px-2 py-1 bg-gray-200" @click="change(-1)">Semaine précédente</button>
-      <button class="px-2 py-1 bg-gray-200" @click="change(1)">Semaine suivante</button>
-      <button class="px-2 py-1 bg-blue-600 text-white" @click="openModal">Générer le menu</button>
-      <button class="ml-auto px-2 py-1 bg-green-600 text-white" @click="openShopping">Liste de course de la semaine</button>
+      <button class="px-2 py-1 bg-gray-200" @click="change(-1)">{{ $t('menuPage.previousWeek') }}</button>
+      <button class="px-2 py-1 bg-gray-200" @click="change(1)">{{ $t('menuPage.nextWeek') }}</button>
+      <button class="px-2 py-1 bg-blue-600 text-white" @click="openModal">{{ $t('menuPage.generateMenu') }}</button>
+      <button class="ml-auto px-2 py-1 bg-green-600 text-white" @click="openShopping">{{ $t('menuPage.shoppingListWeek') }}</button>
     </div>
     <table class="w-full text-left">
       <thead>
         <tr>
-          <th>Jour</th>
-          <th>Déjeuner</th>
-          <th>Diner</th>
+          <th>{{ $t('menuPage.day') }}</th>
+          <th>{{ $t('menuPage.lunch') }}</th>
+          <th>{{ $t('menuPage.dinner') }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="day in ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche']" :key="day">
-          <td class="capitalize">{{ day }}</td>
+          <td class="capitalize">{{ $t(`days.${day}`) }}</td>
           <td>
             <RouterLink
               v-if="menu.find(m => m.jour === day && m.moment === 'dejeuner')?.recipe_id"
@@ -119,8 +121,8 @@ onMounted(load)
           <thead>
             <tr>
               <th></th>
-              <th>Déjeuner</th>
-              <th>Diner</th>
+              <th>{{ $t('menuPage.lunch') }}</th>
+              <th>{{ $t('menuPage.dinner') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -132,21 +134,21 @@ onMounted(load)
           </tbody>
         </table>
         <div class="mt-2 space-x-2">
-          <button class="px-2 py-1 bg-blue-600 text-white" @click="gen">Générer</button>
-          <button class="px-2 py-1 bg-gray-200" @click="showModal=false">Annuler</button>
+          <button class="px-2 py-1 bg-blue-600 text-white" @click="gen">{{ $t('menuPage.generate') }}</button>
+          <button class="px-2 py-1 bg-gray-200" @click="showModal=false">{{ $t('menuPage.cancel') }}</button>
         </div>
       </div>
     </div>
     <div v-if="showShopping" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div class="bg-white p-4">
-        <h2 class="text-lg font-bold mb-2">Liste de course</h2>
+        <h2 class="text-lg font-bold mb-2">{{ $t('menuPage.shoppingList') }}</h2>
         <ul class="list-disc list-inside">
           <li v-for="ing in shopping" :key="ing.id">
             {{ ing.nom }} : {{ ing.quantite }} {{ ing.unite }}
           </li>
         </ul>
         <div class="mt-2 text-right">
-          <button class="px-2 py-1 bg-gray-200" @click="showShopping=false">Fermer</button>
+          <button class="px-2 py-1 bg-gray-200" @click="showShopping=false">{{ $t('menuPage.close') }}</button>
         </div>
       </div>
     </div>

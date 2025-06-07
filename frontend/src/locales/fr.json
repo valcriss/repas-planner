@@ -1,0 +1,67 @@
+{
+  "common": { "to": "au" },
+  "app": {
+    "title": "Repas Planner",
+    "recipes": "Recettes",
+    "menu": "Menu"
+  },
+  "addRecipe": {
+    "editTitle": "Modifier la recette",
+    "addTitle": "Ajouter une recette",
+    "name": "Nom",
+    "instructions": "Instructions",
+    "imageUrl": "URL de l'image",
+    "ingredients": "Ingrédients",
+    "mainIngredient": "Ingrédient principal de la recette",
+    "secondaryIngredient": "Ingrédient secondaire",
+    "removeIngredient": "Supprimer l'ingrédient",
+    "addIngredient": "Ajouter un ingrédient",
+    "save": "Enregistrer"
+  },
+  "login": {
+    "title": "Connexion",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "submit": "Se connecter"
+  },
+  "menuPage": {
+    "title": "Menu du {range}",
+    "previousWeek": "Semaine précédente",
+    "nextWeek": "Semaine suivante",
+    "generateMenu": "Générer le menu",
+    "shoppingListWeek": "Liste de course de la semaine",
+    "day": "Jour",
+    "lunch": "Déjeuner",
+    "dinner": "Diner",
+    "generate": "Générer",
+    "cancel": "Annuler",
+    "shoppingList": "Liste de course",
+    "close": "Fermer"
+  },
+  "recipeDetail": {
+    "back": "Retour",
+    "ingredients": "Ingrédients",
+    "description": "Description",
+    "edit": "Éditer",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer cette recette ?"
+  },
+  "recipesPage": {
+    "title": "Recettes",
+    "addRecipe": "Ajouter une recette",
+    "importExport": "Importer/Exporter",
+    "fileToImport": "fichier à importer",
+    "import": "Importer",
+    "export": "Exporter",
+    "imageAlt": "Image de la recette"
+  },
+  "days": {
+    "lundi": "lundi",
+    "mardi": "mardi",
+    "mercredi": "mercredi",
+    "jeudi": "jeudi",
+    "vendredi": "vendredi",
+    "samedi": "samedi",
+    "dimanche": "dimanche"
+  }
+}

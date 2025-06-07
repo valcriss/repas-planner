@@ -50,21 +50,21 @@ onMounted(async () => {
   <div>
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-bold">
-        Recettes
+        {{ $t('recipesPage.title') }}
       </h1>
       <div class="flex gap-2">
         <RouterLink
           to="/recipes/add"
           class="px-3 py-1 bg-blue-600 text-white rounded"
         >
-          Ajouter une recette
+          {{ $t('recipesPage.addRecipe') }}
         </RouterLink>
         <button
           data-test="import-btn"
           class="px-3 py-1 bg-green-600 text-white rounded"
           @click="showImport = true"
         >
-          Importer/Exporter
+          {{ $t('recipesPage.importExport') }}
         </button>
       </div>
     </div>
@@ -77,7 +77,7 @@ onMounted(async () => {
       >
         <img
           :src="recipe.image_url || placeholderImg"
-          alt="Image de la recette"
+          :alt="$t('recipesPage.imageAlt')"
           class="w-full h-32 object-cover rounded mb-2"
         >
         <h2 class="font-medium text-lg mb-1">
@@ -94,7 +94,7 @@ onMounted(async () => {
     >
       <div class="bg-white p-4 rounded space-y-4">
         <div>
-          <label class="block mb-2">fichier à importer</label>
+          <label class="block mb-2">{{ $t('recipesPage.fileToImport') }}</label>
           <input
             type="file"
             @change="onFile"
@@ -103,7 +103,7 @@ onMounted(async () => {
             class="ml-2 px-3 py-1 bg-blue-600 text-white rounded"
             @click="doImport"
           >
-            Importer
+            {{ $t('recipesPage.import') }}
           </button>
         </div>
         <div class="text-right">
@@ -111,7 +111,7 @@ onMounted(async () => {
             class="px-3 py-1 bg-green-600 text-white rounded"
             @click="doExport"
           >
-            Exporter
+            {{ $t('recipesPage.export') }}
           </button>
         </div>
       </div>

@@ -1,0 +1,67 @@
+{
+  "common": { "to": "to" },
+  "app": {
+    "title": "Repas Planner",
+    "recipes": "Recipes",
+    "menu": "Menu"
+  },
+  "addRecipe": {
+    "editTitle": "Edit recipe",
+    "addTitle": "Add a recipe",
+    "name": "Name",
+    "instructions": "Instructions",
+    "imageUrl": "Image URL",
+    "ingredients": "Ingredients",
+    "mainIngredient": "Main recipe ingredient",
+    "secondaryIngredient": "Secondary ingredient",
+    "removeIngredient": "Remove ingredient",
+    "addIngredient": "Add ingredient",
+    "save": "Save"
+  },
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in"
+  },
+  "menuPage": {
+    "title": "Menu for {range}",
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
+    "generateMenu": "Generate menu",
+    "shoppingListWeek": "Shopping list for the week",
+    "day": "Day",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "generate": "Generate",
+    "cancel": "Cancel",
+    "shoppingList": "Shopping list",
+    "close": "Close"
+  },
+  "recipeDetail": {
+    "back": "Back",
+    "ingredients": "Ingredients",
+    "description": "Description",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this recipe?"
+  },
+  "recipesPage": {
+    "title": "Recipes",
+    "addRecipe": "Add recipe",
+    "importExport": "Import/Export",
+    "fileToImport": "File to import",
+    "import": "Import",
+    "export": "Export",
+    "imageAlt": "Recipe image"
+  },
+  "days": {
+    "lundi": "Monday",
+    "mardi": "Tuesday",
+    "mercredi": "Wednesday",
+    "jeudi": "Thursday",
+    "vendredi": "Friday",
+    "samedi": "Saturday",
+    "dimanche": "Sunday"
+  }
+}

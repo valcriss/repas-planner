@@ -1,8 +1,34 @@
+/* global RequestInfo, RequestInit */
 export function getApiBaseUrl(env: { PROD: boolean } = import.meta.env) {
   return env.PROD ? `${globalThis.location.origin}/api` : 'http://localhost:3000/api'
 }
 
 export const API_BASE_URL = getApiBaseUrl()
+
+export async function apiFetch(input: RequestInfo, init: RequestInit = {}) {
+  return globalThis.fetch(input, { credentials: 'include', ...init })
+}
+
+export async function checkAuthRequired() {
+  const res = await apiFetch(`${API_BASE_URL}/auth-required`)
+  return res.json() as Promise<{ required: boolean }>
+}
+
+export async function login(username: string, password: string) {
+  const res = await apiFetch(`${API_BASE_URL}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  })
+  if (!res.ok) throw new Error('Login failed')
+  return res.json()
+}
+
+/* global localStorage */
+export async function logout() {
+  await apiFetch(`${API_BASE_URL}/logout`, { method: 'POST' })
+  localStorage.removeItem('loggedIn')
+}
 
 export interface RecipePayload {
   nom: string
@@ -48,7 +74,7 @@ export interface Unite {
 }
 
 export async function fetchRecipes() {
-  const res = await globalThis.fetch(`${API_BASE_URL}/recipes`)
+  const res = await apiFetch(`${API_BASE_URL}/recipes`)
   if (!res.ok) {
     throw new Error('Failed to fetch recipes')
   }
@@ -56,7 +82,7 @@ export async function fetchRecipes() {
 }
 
 export async function fetchRecipe(id: string): Promise<Recipe> {
-  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/${id}`)
+  const res = await apiFetch(`${API_BASE_URL}/recipes/${id}`)
   if (!res.ok) {
     throw new Error('Failed to fetch recipe')
   }
@@ -64,7 +90,7 @@ export async function fetchRecipe(id: string): Promise<Recipe> {
 }
 
 export async function fetchRecipeIngredients(id: string): Promise<RecipeIngredient[]> {
-  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/${id}/ingredients`)
+  const res = await apiFetch(`${API_BASE_URL}/recipes/${id}/ingredients`)
   if (!res.ok) {
     throw new Error('Failed to fetch ingredients')
   }
@@ -72,7 +98,7 @@ export async function fetchRecipeIngredients(id: string): Promise<RecipeIngredie
 }
 
 export async function createRecipe(payload: RecipePayload) {
-  const res = await globalThis.fetch(`${API_BASE_URL}/recipes`, {
+  const res = await apiFetch(`${API_BASE_URL}/recipes`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -86,7 +112,7 @@ export async function createRecipe(payload: RecipePayload) {
 }
 
 export async function updateRecipe(id: string, payload: RecipePayload) {
-  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/${id}`, {
+  const res = await apiFetch(`${API_BASE_URL}/recipes/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -98,7 +124,7 @@ export async function updateRecipe(id: string, payload: RecipePayload) {
 }
 
 export async function deleteRecipe(id: string) {
-  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/${id}`, {
+  const res = await apiFetch(`${API_BASE_URL}/recipes/${id}`, {
     method: 'DELETE'
   })
   if (!res.ok) {
@@ -109,7 +135,7 @@ export async function deleteRecipe(id: string) {
 export async function searchIngredients(search: string): Promise<Ingredient[]> {
   const params = new globalThis.URLSearchParams()
   params.set('search', search)
-  const res = await globalThis.fetch(`${API_BASE_URL}/ingredients?${params.toString()}`)
+  const res = await apiFetch(`${API_BASE_URL}/ingredients?${params.toString()}`)
   if (!res.ok) {
     throw new Error('Failed to fetch ingredients')
   }
@@ -119,7 +145,7 @@ export async function searchIngredients(search: string): Promise<Ingredient[]> {
 export async function searchUnites(search: string): Promise<Unite[]> {
   const params = new globalThis.URLSearchParams()
   params.set('search', search)
-  const res = await globalThis.fetch(`${API_BASE_URL}/unites?${params.toString()}`)
+  const res = await apiFetch(`${API_BASE_URL}/unites?${params.toString()}`)
   if (!res.ok) {
     throw new Error('Failed to fetch unites')
   }
@@ -140,13 +166,13 @@ export interface Menu {
 }
 
 export async function fetchMenu(week: string): Promise<Menu> {
-  const res = await globalThis.fetch(`${API_BASE_URL}/menus/${week}`)
+  const res = await apiFetch(`${API_BASE_URL}/menus/${week}`)
   if (!res.ok) throw new Error('Failed to fetch menu')
   return res.json()
 }
 
 export async function generateMenu(week: string, selection: Record<string, { dejeuner: boolean; diner: boolean }>) {
-  const res = await globalThis.fetch(`${API_BASE_URL}/menus/${week}/generate`, {
+  const res = await apiFetch(`${API_BASE_URL}/menus/${week}/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ selection })
@@ -163,19 +189,19 @@ export interface ShoppingIngredient {
 }
 
 export async function fetchShoppingList(week: string): Promise<ShoppingIngredient[]> {
-  const res = await globalThis.fetch(`${API_BASE_URL}/menus/${week}/shopping-list`)
+  const res = await apiFetch(`${API_BASE_URL}/menus/${week}/shopping-list`)
   if (!res.ok) throw new Error('Failed to fetch shopping list')
   return res.json()
 }
 
 export async function exportRecipes() {
-  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/export`)
+  const res = await apiFetch(`${API_BASE_URL}/recipes/export`)
   if (!res.ok) throw new Error('Failed to export recipes')
   return res.json()
 }
 
 export async function importRecipes(data: unknown) {
-  const res = await globalThis.fetch(`${API_BASE_URL}/recipes/import`, {
+  const res = await apiFetch(`${API_BASE_URL}/recipes/import`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)

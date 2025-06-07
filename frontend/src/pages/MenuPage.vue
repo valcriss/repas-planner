@@ -3,7 +3,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { fetchMenu, generateMenu, fetchShoppingList } from '../api'
+import { fetchMenu, generateMenu, fetchShoppingList, markRecipeDone } from '../api'
 import type { MenuRecipe, ShoppingIngredient } from '../api'
 import { weekRange, weekString } from '../week'
 
@@ -16,6 +16,7 @@ const showModal = ref(false)
 const selection = ref<Record<string, { dejeuner: boolean; diner: boolean }>>({})
 const showShopping = ref(false)
 const shopping = ref<ShoppingIngredient[]>([])
+const isCurrentWeek = computed(() => weekString(new Date()) === week.value)
 
 const range = computed(() => {
   const { start, end } = weekRange(week.value)
@@ -69,6 +70,11 @@ async function openShopping() {
   showShopping.value = true
 }
 
+async function done(day: string, moment: 'dejeuner' | 'diner') {
+  await markRecipeDone(week.value, day, moment)
+  openShopping()
+}
+
 onMounted(load)
 </script>
 <template>
@@ -100,6 +106,13 @@ onMounted(load)
               {{ menu.find(m => m.jour === day && m.moment === 'dejeuner')!.recipe_nom }}
             </RouterLink>
             <span v-else>-</span>
+            <button
+              v-if="isCurrentWeek && menu.find(m => m.jour === day && m.moment === 'dejeuner')?.recipe_id"
+              class="ml-2 px-1 bg-gray-200"
+              @click="done(day, 'dejeuner')"
+            >
+              {{ $t('menuPage.done') }}
+            </button>
           </td>
           <td>
             <RouterLink
@@ -110,6 +123,13 @@ onMounted(load)
               {{ menu.find(m => m.jour === day && m.moment === 'diner')!.recipe_nom }}
             </RouterLink>
             <span v-else>-</span>
+            <button
+              v-if="isCurrentWeek && menu.find(m => m.jour === day && m.moment === 'diner')?.recipe_id"
+              class="ml-2 px-1 bg-gray-200"
+              @click="done(day, 'diner')"
+            >
+              {{ $t('menuPage.done') }}
+            </button>
           </td>
         </tr>
       </tbody>
@@ -142,11 +162,22 @@ onMounted(load)
     <div v-if="showShopping" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div class="bg-white p-4">
         <h2 class="text-lg font-bold mb-2">{{ $t('menuPage.shoppingList') }}</h2>
-        <ul class="list-disc list-inside">
-          <li v-for="ing in shopping" :key="ing.id">
-            {{ ing.nom }} : {{ ing.quantite }} {{ ing.unite }}
-          </li>
-        </ul>
+        <table>
+          <thead>
+            <tr>
+              <th>{{ $t('addRecipe.name') }}</th>
+              <th>{{ $t('menuPage.quantityNeeded') }}</th>
+              <th>{{ $t('menuPage.quantityToBuy') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="ing in shopping" :key="ing.id">
+              <td>{{ ing.nom }}</td>
+              <td>{{ ing.quantite }} {{ ing.unite }}</td>
+              <td>{{ ing.manque }} {{ ing.unite }}</td>
+            </tr>
+          </tbody>
+        </table>
         <div class="mt-2 text-right">
           <button class="px-2 py-1 bg-gray-200" @click="showShopping=false">{{ $t('menuPage.close') }}</button>
         </div>

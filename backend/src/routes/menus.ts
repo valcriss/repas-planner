@@ -81,20 +81,62 @@ router.get('/:week/shopping-list', async (req: Request, res: Response, next: Nex
   try {
     const { rows } = await pool.query(
       `SELECT i.id, i.nom, u.nom AS unite,
-              SUM(COALESCE(ri.quantite::numeric,0))::text AS quantite
+              SUM(COALESCE(ri.quantite::numeric,0))::text AS quantite,
+              GREATEST(SUM(COALESCE(ri.quantite::numeric,0)) - COALESCE(s.quantite,0),0)::text AS manque
        FROM menus m
        JOIN menu_recipes mr ON mr.menu_id = m.id
        JOIN recipe_ingredients ri ON ri.recipe_id = mr.recipe_id
        JOIN ingredients i ON i.id = ri.ingredient_id
+       LEFT JOIN stock s ON s.ingredient_id = i.id
        LEFT JOIN unites u ON u.id = ri.unite_id
        WHERE m.semaine = $1
-       GROUP BY i.id, i.nom, u.nom
+       GROUP BY i.id, i.nom, u.nom, s.quantite
        ORDER BY i.nom`,
       [week]
     )
     res.json(rows)
   } catch (err) {
     next(err)
+  }
+})
+
+router.post('/:week/:jour/:moment/done', async (req: Request, res: Response, next: NextFunction) => {
+  const { week, jour, moment } = req.params
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+    const { rows } = await client.query(
+      `SELECT mr.recipe_id FROM menus m
+       JOIN menu_recipes mr ON mr.menu_id = m.id
+       WHERE m.semaine = $1 AND mr.jour = $2 AND mr.moment = $3`,
+      [week, jour, moment]
+    )
+    if (rows.length === 0 || !rows[0].recipe_id) {
+      await client.query('ROLLBACK')
+      res.status(404).json({ error: 'Not found' })
+      return
+    }
+    const recipeId = rows[0].recipe_id as string
+    const { rows: ings } = await client.query(
+      'SELECT ingredient_id, quantite::numeric FROM recipe_ingredients WHERE recipe_id = $1',
+      [recipeId]
+    )
+    for (const r of ings) {
+      await client.query(
+        `INSERT INTO stock(ingredient_id, quantite)
+         VALUES ($1, 0)
+         ON CONFLICT (ingredient_id)
+         DO UPDATE SET quantite = GREATEST(stock.quantite - $2, 0)`,
+        [r.ingredient_id as string, r.quantite]
+      )
+    }
+    await client.query('COMMIT')
+    res.status(204).send()
+  } catch (err) {
+    await client.query('ROLLBACK')
+    next(err)
+  } finally {
+    client.release()
   }
 })
 

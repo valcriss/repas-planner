@@ -7,6 +7,7 @@ import recipeRoutes from './routes/recipes';
 import ingredientRoutes from './routes/ingredients';
 import uniteRoutes from './routes/unites';
 import menuRoutes from './routes/menus';
+import stockRoutes from './routes/stock';
 import {
   authMiddleware,
   loginRoute,
@@ -31,6 +32,7 @@ app.use(express.static(frontendPath));
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/ingredients', ingredientRoutes);
 app.use('/api/unites', uniteRoutes);
+app.use('/api/stock', stockRoutes);
 app.use('/api/menus', menuRoutes);
 
 app.get('*', (_req, res) => {

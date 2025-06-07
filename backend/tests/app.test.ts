@@ -5,8 +5,12 @@ import os from 'os';
 import path from 'path';
 
 vi.mock('../src/db', () => {
+  const query = vi.fn();
   return {
-    default: { query: vi.fn() }
+    default: {
+      query,
+      connect: vi.fn(() => ({ query, release: vi.fn() }))
+    }
   };
 });
 
@@ -81,16 +85,43 @@ describe('GET /ingredients/all and /unites/all', () => {
 
 describe('GET /menus/:week/shopping-list', () => {
   it('returns aggregated ingredients', async () => {
-    mockedQuery.mockResolvedValueOnce({ rows: [{ id: 'i1', nom: 'Beurre', quantite: '700', unite: 'g' }] });
+    mockedQuery.mockResolvedValueOnce({ rows: [{ id: 'i1', nom: 'Beurre', quantite: '700', unite: 'g', manque: '200' }] });
     const res = await request(app).get('/api/menus/2024-W01/shopping-list');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([{ id: 'i1', nom: 'Beurre', quantite: '700', unite: 'g' }]);
+    expect(res.body).toEqual([{ id: 'i1', nom: 'Beurre', quantite: '700', unite: 'g', manque: '200' }]);
   });
 
   it('handles errors', async () => {
     mockedQuery.mockRejectedValueOnce(new Error('fail'));
     const res = await request(app).get('/api/menus/2024-W01/shopping-list');
     expect(res.status).toBe(500);
+  });
+});
+
+describe('stock routes', () => {
+  it('lists stock', async () => {
+    mockedQuery.mockResolvedValueOnce({ rows: [] });
+    const res = await request(app).get('/api/stock');
+    expect(res.status).toBe(200);
+  });
+
+  it('updates stock', async () => {
+    mockedQuery.mockResolvedValueOnce({});
+    const res = await request(app).put('/api/stock/i1').send({ quantite: 1 });
+    expect(res.status).toBe(204);
+  });
+});
+
+describe('POST /menus/:week/:jour/:moment/done', () => {
+  it('updates stock based on recipe', async () => {
+    mockedQuery
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({ rows: [{ recipe_id: 'r' }] })
+      .mockResolvedValueOnce({ rows: [{ ingredient_id: 'i', quantite: 1 }] })
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({})
+    const res = await request(app).post('/api/menus/2024-W01/lundi/dejeuner/done');
+    expect(res.status).toBe(204);
   });
 });
 

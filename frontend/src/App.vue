@@ -22,6 +22,12 @@ import { RouterLink, RouterView } from 'vue-router'
           >
             {{ $t('app.menu') }}
           </RouterLink>
+          <RouterLink
+            to="/stock"
+            class="hover:underline"
+          >
+            {{ $t('app.stock') }}
+          </RouterLink>
         </nav>
       </div>
     </header>

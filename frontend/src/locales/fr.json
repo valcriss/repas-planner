@@ -3,7 +3,8 @@
   "app": {
     "title": "Repas Planner",
     "recipes": "Recettes",
-    "menu": "Menu"
+    "menu": "Menu",
+    "stock": "Stock"
   },
   "addRecipe": {
     "editTitle": "Modifier la recette",
@@ -36,7 +37,10 @@
     "generate": "Générer",
     "cancel": "Annuler",
     "shoppingList": "Liste de course",
-    "close": "Fermer"
+    "close": "Fermer",
+    "done": "Fait",
+    "quantityNeeded": "Quantité nécessaire",
+    "quantityToBuy": "Quantité à acheter"
   },
   "recipeDetail": {
     "back": "Retour",
@@ -54,6 +58,10 @@
     "import": "Importer",
     "export": "Exporter",
     "imageAlt": "Image de la recette"
+  },
+  "stockPage": {
+    "title": "Stock",
+    "quantity": "Quantité"
   },
   "days": {
     "lundi": "lundi",

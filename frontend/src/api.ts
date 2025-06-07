@@ -206,6 +206,7 @@ export interface ShoppingIngredient {
   nom: string
   quantite: string
   unite: string | null
+  manque?: string
 }
 
 export async function fetchShoppingList(week: string): Promise<ShoppingIngredient[]> {
@@ -227,4 +228,31 @@ export async function importRecipes(data: unknown) {
     body: JSON.stringify(data)
   })
   if (!res.ok) throw new Error('Failed to import recipes')
+}
+
+export interface StockItem {
+  id: string
+  nom: string
+  quantite: string
+  unite: string | null
+}
+
+export async function fetchStock(): Promise<StockItem[]> {
+  const res = await apiFetch(`${API_BASE_URL}/stock`)
+  if (!res.ok) throw new Error('Failed to fetch stock')
+  return res.json()
+}
+
+export async function updateStock(id: string, quantite: string) {
+  const res = await apiFetch(`${API_BASE_URL}/stock/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ quantite })
+  })
+  if (!res.ok) throw new Error('Failed to update stock')
+}
+
+export async function markRecipeDone(week: string, day: string, moment: 'dejeuner' | 'diner') {
+  const res = await apiFetch(`${API_BASE_URL}/menus/${week}/${day}/${moment}/done`, { method: 'POST' })
+  if (!res.ok) throw new Error('Failed to mark done')
 }

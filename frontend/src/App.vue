@@ -7,20 +7,20 @@ import { RouterLink, RouterView } from 'vue-router'
     <header class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4">
       <div class="container mx-auto px-4 flex items-center justify-between">
         <h1 class="text-xl font-semibold">
-          Repas Planner
+          {{ $t('app.title') }}
         </h1>
         <nav class="space-x-4 font-medium">
           <RouterLink
             to="/recipes"
             class="hover:underline"
           >
-            Recettes
+            {{ $t('app.recipes') }}
           </RouterLink>
           <RouterLink
             to="/menu"
             class="hover:underline"
           >
-            Menu
+            {{ $t('app.menu') }}
           </RouterLink>
         </nav>
       </div>

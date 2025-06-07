@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, type Mock, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
+import { createI18n } from 'vue-i18n'
+import { messages } from '../i18n'
 import RecipeDetailPage from './RecipeDetailPage.vue'
 import { routes } from '../router'
 import * as api from '../api'
@@ -20,7 +22,8 @@ async function setup() {
   const router = createRouter({ history: createWebHistory(), routes })
   router.push('/recipes/r1')
   await router.isReady()
-  const wrapper = mount(RecipeDetailPage, { global: { plugins: [router] } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages })
+  const wrapper = mount(RecipeDetailPage, { global: { plugins: [router, i18n] } })
   return { wrapper, router }
 }
 

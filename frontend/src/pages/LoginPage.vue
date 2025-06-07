@@ -25,10 +25,10 @@ async function submit() {
     @submit.prevent="submit"
   >
     <h1 class="text-2xl font-bold mb-4">
-      Connexion
+      {{ $t('login.title') }}
     </h1>
     <div class="mb-2">
-      <label class="block mb-1">Nom d'utilisateur</label>
+      <label class="block mb-1">{{ $t('login.username') }}</label>
       <input
         v-model="username"
         class="border rounded w-full p-2"
@@ -36,7 +36,7 @@ async function submit() {
       >
     </div>
     <div class="mb-4">
-      <label class="block mb-1">Mot de passe</label>
+      <label class="block mb-1">{{ $t('login.password') }}</label>
       <input
         v-model="password"
         type="password"
@@ -45,7 +45,7 @@ async function submit() {
       >
     </div>
     <button class="px-3 py-1 bg-blue-600 text-white rounded">
-      Se connecter
+      {{ $t('login.submit') }}
     </button>
   </form>
 </template>

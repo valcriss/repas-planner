@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { fetchRecipe, fetchRecipeIngredients, deleteRecipe } from '../api'
 import type { Recipe, RecipeIngredient } from '../api'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const recipe = ref<Recipe | null>(null)
 const ingredients = ref<RecipeIngredient[]>([])
 
@@ -21,7 +23,7 @@ onMounted(async () => {
 
 async function remove() {
   if (!recipe.value) return
-  if (!globalThis.confirm('Supprimer cette recette ?')) return
+  if (!globalThis.confirm(t('recipeDetail.deleteConfirm'))) return
   try {
     await deleteRecipe(recipe.value.id)
     router.push('/recipes')
@@ -40,7 +42,7 @@ async function remove() {
       class="text-blue-600"
       @click="router.back()"
     >
-      &larr; Retour
+      &larr; {{ $t('recipeDetail.back') }}
     </button>
     <h1 class="text-3xl font-bold my-4">
       {{ recipe.nom }}
@@ -51,7 +53,7 @@ async function remove() {
       class="mb-4 w-full object-cover rounded"
     >
     <h2 class="text-xl font-semibold mb-2">
-      Ingrédients
+      {{ $t('recipeDetail.ingredients') }}
     </h2>
     <ul class="list-disc list-inside mb-4">
       <li
@@ -62,7 +64,7 @@ async function remove() {
       </li>
     </ul>
     <h2 class="text-xl font-semibold mb-2">
-      Description
+      {{ $t('recipeDetail.description') }}
     </h2>
     <p class="whitespace-pre-line">
       {{ recipe.instructions }}
@@ -72,14 +74,14 @@ async function remove() {
         :to="`/recipes/${recipe.id}/edit`"
         class="px-3 py-1 bg-blue-600 text-white rounded"
       >
-        Éditer
+        {{ $t('recipeDetail.edit') }}
       </RouterLink>
       <button
         type="button"
         class="px-3 py-1 bg-red-600 text-white rounded"
         @click="remove"
       >
-        Supprimer
+        {{ $t('recipeDetail.delete') }}
       </button>
     </div>
   </div>

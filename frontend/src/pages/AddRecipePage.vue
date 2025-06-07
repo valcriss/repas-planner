@@ -88,14 +88,14 @@ onMounted(async () => {
 <template>
   <div class="max-w-md mx-auto">
     <h1 class="text-2xl font-bold mb-4">
-      {{ isEdit ? 'Modifier la recette' : 'Ajouter une recette' }}
+      {{ isEdit ? $t('addRecipe.editTitle') : $t('addRecipe.addTitle') }}
     </h1>
     <form
       class="space-y-4"
       @submit.prevent="submit"
     >
       <div>
-        <label class="block mb-1">Nom</label>
+        <label class="block mb-1">{{ $t('addRecipe.name') }}</label>
         <input
           v-model="nom"
           class="border rounded w-full p-2"
@@ -103,21 +103,21 @@ onMounted(async () => {
         >
       </div>
       <div>
-        <label class="block mb-1">Instructions</label>
+        <label class="block mb-1">{{ $t('addRecipe.instructions') }}</label>
         <textarea
           v-model="instructions"
           class="border rounded w-full p-2"
         />
       </div>
       <div>
-        <label class="block mb-1">URL de l'image</label>
+        <label class="block mb-1">{{ $t('addRecipe.imageUrl') }}</label>
         <input
           v-model="imageUrl"
           class="border rounded w-full p-2"
         >
       </div>
       <div>
-        <label class="block mb-1">Ingrédients</label>
+        <label class="block mb-1">{{ $t('addRecipe.ingredients') }}</label>
         <div
           v-for="(_, idx) in ingredients"
           :key="idx"
@@ -128,7 +128,7 @@ onMounted(async () => {
             v-if="idx === 0"
             class="text-sm text-gray-500"
           >
-            Ingrédient principal de la recette
+            {{ $t('addRecipe.mainIngredient') }}
           </p>
           <div
             v-if="idx > 0"
@@ -140,14 +140,14 @@ onMounted(async () => {
                 :checked="secondaryIdx === idx"
                 @change="toggleSecondary(idx)"
               >
-              <span>Ingrédient secondaire</span>
+              <span>{{ $t('addRecipe.secondaryIngredient') }}</span>
             </label>
             <button
               type="button"
               class="text-red-600 text-sm"
               @click="removeIngredient(idx)"
             >
-              Supprimer l'ingrédient
+              {{ $t('addRecipe.removeIngredient') }}
             </button>
           </div>
         </div>
@@ -156,14 +156,14 @@ onMounted(async () => {
           class="px-2 py-1 bg-gray-200 rounded"
           @click="addIngredient"
         >
-          Ajouter un ingrédient
+          {{ $t('addRecipe.addIngredient') }}
         </button>
       </div>
       <button
         type="submit"
         class="px-3 py-1 bg-blue-600 text-white rounded"
       >
-        Enregistrer
+        {{ $t('addRecipe.save') }}
       </button>
     </form>
   </div>

@@ -74,6 +74,24 @@ For local development, start PostgreSQL with:
 docker compose -f backend/docker-compose.dev.yml up -d
 ```
 
+## Authentication
+
+Menu Planner supports optional cookie‑based authentication. To enable it, set the
+environment variables `AUTH_USERNAME` and `AUTH_PASSWORD` for the backend. If
+these variables are not defined, all API endpoints are publicly accessible.
+
+When authentication is enabled:
+
+- `POST /api/login` accepts `{ "username": "<name>", "password": "<pass>" }` and
+  returns a session cookie on success.
+- `POST /api/logout` clears the session cookie.
+- `GET /api/auth-required` indicates whether authentication is active.
+- All other `/api` routes return **401 Unauthorized** if the cookie is missing or
+  invalid.
+
+The frontend checks this flag on startup and redirects unauthenticated users to
+the login page when needed.
+
 ## License
 Menu Planner is released under the [MIT License](LICENSE).
 

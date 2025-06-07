@@ -7,13 +7,13 @@ vi.mock('../api')
 
 describe('IngredientInput', () => {
   it('shows suggestions and allows picking', async () => {
-    ;(api.searchIngredients as unknown as Mock).mockResolvedValue([{ id: 'i1', nom: 'Tomate', unite: 'kg' }])
-    ;(api.searchUnites as unknown as Mock).mockResolvedValue([{ id: 'u1', nom: 'kg' }])
+    ;(api.fetchAllIngredients as unknown as Mock).mockResolvedValue([{ id: 'i1', nom: 'Tomate', unite: 'kg' }])
+    ;(api.fetchAllUnites as unknown as Mock).mockResolvedValue([{ id: 'u1', nom: 'kg' }])
 
     const wrapper = mount(IngredientInput, {
       props: { modelValue: { nom: '', quantite: '', unite: '' } }
     })
-
+    await flushPromises()
     await wrapper.get('input[placeholder="Ingrédient"]').setValue('tom')
     await flushPromises()
     const itemsIng = wrapper.findAll('ul li').map(li => li.text())
@@ -31,13 +31,14 @@ describe('IngredientInput', () => {
   })
 
   it('handles unit search errors', async () => {
-    ;(api.searchIngredients as unknown as Mock).mockResolvedValue([])
-    ;(api.searchUnites as unknown as Mock).mockRejectedValue(new Error('fail'))
+    ;(api.fetchAllIngredients as unknown as Mock).mockResolvedValue([])
+    ;(api.fetchAllUnites as unknown as Mock).mockRejectedValue(new Error('fail'))
 
     const wrapper = mount(IngredientInput, {
       props: { modelValue: { nom: '', quantite: '', unite: '' } }
     })
 
+    await flushPromises()
     await wrapper.get('input[placeholder="Unité"]').setValue('k')
     await flushPromises()
     expect(wrapper.findAll('ul li')).toHaveLength(0)

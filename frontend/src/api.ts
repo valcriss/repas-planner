@@ -146,10 +146,26 @@ export async function searchIngredients(search: string): Promise<Ingredient[]> {
   return res.json()
 }
 
+export async function fetchAllIngredients(): Promise<Ingredient[]> {
+  const res = await apiFetch(`${API_BASE_URL}/ingredients/all`)
+  if (!res.ok) {
+    throw new Error('Failed to fetch ingredients')
+  }
+  return res.json()
+}
+
 export async function searchUnites(search: string): Promise<Unite[]> {
   const params = new globalThis.URLSearchParams()
   params.set('search', search)
   const res = await apiFetch(`${API_BASE_URL}/unites?${params.toString()}`)
+  if (!res.ok) {
+    throw new Error('Failed to fetch unites')
+  }
+  return res.json()
+}
+
+export async function fetchAllUnites(): Promise<Unite[]> {
+  const res = await apiFetch(`${API_BASE_URL}/unites/all`)
   if (!res.ok) {
     throw new Error('Failed to fetch unites')
   }

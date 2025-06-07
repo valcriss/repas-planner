@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fetchShoppingList, exportRecipes, importRecipes, getApiBaseUrl, checkAuthRequired, login, apiFetch } from './api'
+import { fetchShoppingList, exportRecipes, importRecipes, getApiBaseUrl, checkAuthRequired, login, apiFetch, fetchAllIngredients, fetchAllUnites } from './api'
 
 /* global localStorage */
 
@@ -20,6 +20,23 @@ describe('fetchShoppingList', () => {
   it('throws on failure', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }))
     await expect(fetchShoppingList('w')).rejects.toThrow('Failed to fetch shopping list')
+  })
+})
+
+describe('fetchAllIngredients/unites', () => {
+  it('returns lists', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve([{ id: 'i1', nom: 'Tomate' }]) }))
+    const resIng = await fetchAllIngredients()
+    expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/api/ingredients/all', { credentials: 'include' })
+    expect(resIng[0].nom).toBe('Tomate')
+    ;(globalThis.fetch as unknown as vi.Mock).mockResolvedValue({ ok: true, json: () => Promise.resolve([{ id: 'u1', nom: 'kg' }]) })
+    const resU = await fetchAllUnites()
+    expect(resU[0].nom).toBe('kg')
+  })
+
+  it('throws on failure', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }))
+    await expect(fetchAllIngredients()).rejects.toThrow('Failed to fetch ingredients')
   })
 })
 

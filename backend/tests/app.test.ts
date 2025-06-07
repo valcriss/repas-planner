@@ -66,6 +66,19 @@ describe('GET /unites', () => {
   });
 });
 
+describe('GET /ingredients/all and /unites/all', () => {
+  it('lists all items', async () => {
+    mockedQuery.mockResolvedValueOnce({ rows: [{ id: 'i1', nom: 'Tomate', unite: 'kg' }] });
+    const resIng = await request(app).get('/api/ingredients/all');
+    expect(resIng.status).toBe(200);
+    expect(resIng.body[0].nom).toBe('Tomate');
+    mockedQuery.mockResolvedValueOnce({ rows: [{ id: 'u1', nom: 'kg' }] });
+    const resU = await request(app).get('/api/unites/all');
+    expect(resU.status).toBe(200);
+    expect(resU.body[0].nom).toBe('kg');
+  });
+});
+
 describe('GET /menus/:week/shopping-list', () => {
   it('returns aggregated ingredients', async () => {
     mockedQuery.mockResolvedValueOnce({ rows: [{ id: 'i1', nom: 'Beurre', quantite: '700', unite: 'g' }] });

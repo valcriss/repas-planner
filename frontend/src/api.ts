@@ -1,4 +1,4 @@
-/* global RequestInfo, RequestInit */
+/* global RequestInfo, RequestInit, localStorage, location */
 export function getApiBaseUrl(env: { PROD: boolean } = import.meta.env) {
   return env.PROD ? `${globalThis.location.origin}/api` : 'http://localhost:3000/api'
 }
@@ -6,7 +6,12 @@ export function getApiBaseUrl(env: { PROD: boolean } = import.meta.env) {
 export const API_BASE_URL = getApiBaseUrl()
 
 export async function apiFetch(input: RequestInfo, init: RequestInit = {}) {
-  return globalThis.fetch(input, { credentials: 'include', ...init })
+  const res = await globalThis.fetch(input, { credentials: 'include', ...init })
+  if (res.status === 401) {
+    localStorage.removeItem('loggedIn')
+    location.assign('/login')
+  }
+  return res
 }
 
 export async function checkAuthRequired() {
@@ -24,7 +29,6 @@ export async function login(username: string, password: string) {
   return res.json()
 }
 
-/* global localStorage */
 export async function logout() {
   await apiFetch(`${API_BASE_URL}/logout`, { method: 'POST' })
   localStorage.removeItem('loggedIn')

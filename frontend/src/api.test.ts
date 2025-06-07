@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fetchShoppingList, exportRecipes, importRecipes, getApiBaseUrl, checkAuthRequired, login } from './api'
+import { fetchShoppingList, exportRecipes, importRecipes, getApiBaseUrl, checkAuthRequired, login, apiFetch } from './api'
+
+/* global localStorage */
 
 const data = [{ id: 'i1', nom: 'Beurre', quantite: '700', unite: 'g' }]
 
@@ -58,5 +60,16 @@ describe('auth helpers', () => {
     const call = (globalThis.fetch as unknown as vi.Mock).mock.calls[0]
     expect(call[0]).toBe('http://localhost:3000/api/login')
     expect(call[1].credentials).toBe('include')
+  })
+
+  it('apiFetch redirects on 401', async () => {
+    const response = { status: 401, ok: false }
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response))
+    vi.stubGlobal('location', { assign: vi.fn() })
+    localStorage.setItem('loggedIn', '1')
+    const res = await apiFetch('url')
+    expect(res).toBe(response)
+    expect(localStorage.getItem('loggedIn')).toBeNull()
+    expect(globalThis.location.assign).toHaveBeenCalledWith('/login')
   })
 })

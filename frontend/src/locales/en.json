@@ -3,7 +3,8 @@
   "app": {
     "title": "Repas Planner",
     "recipes": "Recipes",
-    "menu": "Menu"
+    "menu": "Menu",
+    "stock": "Stock"
   },
   "addRecipe": {
     "editTitle": "Edit recipe",
@@ -36,7 +37,10 @@
     "generate": "Generate",
     "cancel": "Cancel",
     "shoppingList": "Shopping list",
-    "close": "Close"
+    "close": "Close",
+    "done": "Done",
+    "quantityNeeded": "Quantity needed",
+    "quantityToBuy": "Quantity to buy"
   },
   "recipeDetail": {
     "back": "Back",
@@ -54,6 +58,10 @@
     "import": "Import",
     "export": "Export",
     "imageAlt": "Recipe image"
+  },
+  "stockPage": {
+    "title": "Stock",
+    "quantity": "Quantity"
   },
   "days": {
     "lundi": "Monday",

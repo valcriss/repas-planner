@@ -4,6 +4,7 @@ import AddRecipePage from './pages/AddRecipePage.vue'
 import RecipeDetailPage from './pages/RecipeDetailPage.vue'
 import MenuPage from './pages/MenuPage.vue'
 import LoginPage from './pages/LoginPage.vue'
+import StockPage from './pages/StockPage.vue'
 import { checkAuthRequired } from './api'
 
 export const routes = [
@@ -13,6 +14,7 @@ export const routes = [
   { path: '/recipes/:id/edit', component: AddRecipePage },
   { path: '/recipes/add', component: AddRecipePage },
   { path: '/menu', component: MenuPage },
+  { path: '/stock', component: StockPage },
   { path: '/login', component: LoginPage }
 ]
 

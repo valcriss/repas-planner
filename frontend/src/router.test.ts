@@ -19,6 +19,7 @@ describe('router', () => {
     expect(paths).toContain('/recipes/:id/edit')
     expect(paths).toContain('/recipes/add')
     expect(paths).toContain('/menu')
+    expect(paths).toContain('/stock')
     expect(paths).toContain('/login')
   })
 

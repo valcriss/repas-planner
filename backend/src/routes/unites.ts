@@ -21,5 +21,19 @@ router.get('/', async (req: Request, res: Response, next: NextFunction): Promise
   }
 });
 
+// GET /unites/all - list all units
+router.get('/all', async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, nom
+       FROM unites
+       ORDER BY nom`
+    );
+    res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
 

@@ -24,6 +24,21 @@ router.get('/', async (req: Request, res: Response, next: NextFunction): Promise
   }
 });
 
+// GET /ingredients/all - list all ingredients
+router.get('/all', async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT i.id, i.nom, u.nom AS unite
+       FROM ingredients i
+       LEFT JOIN unites u ON u.id = i.unite_id
+       ORDER BY i.nom`
+    );
+    res.json(rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /ingredients - create a new ingredient
 router.post('/', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { nom, unite } = req.body;

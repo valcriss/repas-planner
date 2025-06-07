@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { searchIngredients, searchUnites } from '../api'
+import { ref, watch, onMounted } from 'vue'
+import { fetchAllIngredients, fetchAllUnites } from '../api'
 import type { Ingredient, Unite } from '../api'
 
 interface IngredientData {
@@ -22,6 +22,21 @@ const data = ref({ ...props.modelValue })
 const suggestions = ref<Ingredient[]>([])
 const unitSuggestions = ref<Unite[]>([])
 const justPicked = ref(false)
+const allIngredients = ref<Ingredient[]>([])
+const allUnites = ref<Unite[]>([])
+
+onMounted(async () => {
+  try {
+    allIngredients.value = await fetchAllIngredients()
+  } catch {
+    allIngredients.value = []
+  }
+  try {
+    allUnites.value = await fetchAllUnites()
+  } catch {
+    allUnites.value = []
+  }
+})
 
 watch(() => props.modelValue, v => {
   data.value = { ...v }
@@ -31,7 +46,7 @@ watch(data, v => emit('update:modelValue', v), { deep: true })
 
 watch(
   () => data.value.nom,
-  async (val) => {
+  (val) => {
     if (!justPicked.value && data.value.id) {
       data.value.id = undefined
     } else if (justPicked.value) {
@@ -41,26 +56,24 @@ watch(
       suggestions.value = []
       return
     }
-    try {
-      suggestions.value = await searchIngredients(val)
-    } catch {
-      suggestions.value = []
-    }
+    const search = val.toLowerCase()
+    suggestions.value = allIngredients.value
+      .filter(i => i.nom.toLowerCase().includes(search))
+      .slice(0, 10)
   }
 )
 
 watch(
   () => data.value.unite,
-  async (val) => {
+  (val) => {
     if (!val || data.value.id) {
       unitSuggestions.value = []
       return
     }
-    try {
-      unitSuggestions.value = await searchUnites(val)
-    } catch {
-      unitSuggestions.value = []
-    }
+    const search = val.toLowerCase()
+    unitSuggestions.value = allUnites.value
+      .filter(u => u.nom.toLowerCase().includes(search))
+      .slice(0, 10)
   }
 )
 

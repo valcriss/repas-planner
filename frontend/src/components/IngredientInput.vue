@@ -19,6 +19,10 @@ const emit = defineEmits<{
 }>()
 
 const data = ref({ ...props.modelValue })
+
+function equal(a: IngredientData, b: IngredientData) {
+  return a.id === b.id && a.nom === b.nom && a.quantite === b.quantite && a.unite === b.unite
+}
 const suggestions = ref<Ingredient[]>([])
 const unitSuggestions = ref<Unite[]>([])
 const justPicked = ref(false)
@@ -38,11 +42,24 @@ onMounted(async () => {
   }
 })
 
-watch(() => props.modelValue, v => {
-  data.value = { ...v }
-})
-
-watch(data, v => emit('update:modelValue', v), { deep: true })
+watch(
+  () => props.modelValue,
+  v => {
+    if (!equal(v, data.value)) {
+      data.value = { ...v }
+    }
+  },
+  { deep: true }
+)
+watch(
+  data,
+  v => {
+    if (!equal(v, props.modelValue)) {
+      emit('update:modelValue', v)
+    }
+  },
+  { deep: true }
+)
 
 watch(
   () => data.value.nom,

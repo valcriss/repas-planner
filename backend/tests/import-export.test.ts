@@ -67,3 +67,62 @@ describe('POST /recipes/import', () => {
     expect(calls.some(s => s.includes('INSERT INTO recipe_ingredients'))).toBe(true)
   })
 })
+
+describe('POST /recipes/import-yaml', () => {
+  it('rejects invalid data', async () => {
+    const res = await request(app).post('/api/recipes/import-yaml').send({})
+    expect(res.status).toBe(400)
+  })
+
+  it('imports a family-meal-planner recipe', async () => {
+    const q = vi.fn()
+    mockedConnect.mockResolvedValue({ query: q, release: vi.fn() })
+    q.mockResolvedValue({ rows: [] })
+    const yamlFile = [
+      'id: carbonara',
+      'name: "Pâtes carbonara"',
+      'mainIngredients:',
+      '  - id: pates',
+      '    shop: supermarche',
+      '    amount: 115',
+      '    unit: g',
+      '    scaling: per_portion',
+      '  - id: lardons',
+      '    shop: boucher',
+      '    amount: 35',
+      '    unit: g',
+      '    scaling: per_portion'
+    ].join('\n')
+    const res = await request(app).post('/api/recipes/import-yaml').send({ files: [yamlFile] })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({ imported: 1, skipped: 0 })
+    const calls = q.mock.calls.map(c => c[0])
+    expect(calls.some(s => s.includes('INSERT INTO recipes'))).toBe(true)
+    expect(calls.some(s => s.includes('INSERT INTO recipe_ingredients'))).toBe(true)
+  })
+
+  it('skips recipes that already exist by name', async () => {
+    const q = vi.fn()
+    mockedConnect.mockResolvedValue({ query: q, release: vi.fn() })
+    q.mockImplementation((sql: string) => {
+      if (typeof sql === 'string' && sql.includes('SELECT 1 FROM recipes WHERE nom')) {
+        return Promise.resolve({ rows: [{}] })
+      }
+      return Promise.resolve({ rows: [] })
+    })
+    const yamlFile = ['name: "Pâtes carbonara"', 'mainIngredients: []'].join('\n')
+    const res = await request(app).post('/api/recipes/import-yaml').send({ files: [yamlFile] })
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({ imported: 0, skipped: 1 })
+  })
+
+  it('rolls back when a file is missing required fields', async () => {
+    const q = vi.fn()
+    mockedConnect.mockResolvedValue({ query: q, release: vi.fn() })
+    q.mockResolvedValue({ rows: [] })
+    const res = await request(app).post('/api/recipes/import-yaml').send({ files: ['family: no-name'] })
+    expect(res.status).toBe(500)
+    const calls = q.mock.calls.map(c => c[0])
+    expect(calls.some(s => s === 'ROLLBACK')).toBe(true)
+  })
+})

@@ -1,7 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express'
 import { randomUUID } from 'crypto'
+import yaml from 'js-yaml'
 import pool from '../db'
 import { findOrCreateUnite } from '../unite'
+import { findOrCreateIngredient } from '../ingredient'
 import { PoolClient } from 'pg'
 
 interface ImportIngredient { id?: string; nom: string; quantite: string; unite: string }
@@ -12,6 +14,47 @@ interface ImportRecipe {
   ingredient_secondaire_id?: string
   image_url?: string
   ingredients?: ImportIngredient[]
+}
+
+interface FamilyMealPlannerIngredient {
+  id: string
+  amount: number
+  unit: string
+}
+interface FamilyMealPlannerRecipe {
+  name: string
+  mainIngredients?: FamilyMealPlannerIngredient[]
+}
+
+// Known slug -> readable French name for ingredients found in family-meal-planner recipes.
+// Unknown slugs fall back to a plain underscore-to-space humanization (no accents).
+const INGREDIENT_NAMES: Record<string, string> = {
+  pates: 'Pâtes',
+  lardons: 'Lardons',
+  creme: 'Crème',
+  parmesan: 'Parmesan',
+  jambon: 'Jambon',
+  emmental: 'Emmental',
+  mais: 'Maïs',
+  dinde: 'Dinde',
+  riz: 'Riz',
+  porc: 'Porc',
+  tagliatelles: 'Tagliatelles',
+  poulet: 'Poulet',
+  tortillas: 'Tortillas',
+  salade: 'Salade',
+  tomates: 'Tomates',
+  steak_hache: 'Steak haché',
+  pommes_de_terre: 'Pommes de terre',
+  pain_burger: 'Pain burger',
+  fromage_burger: 'Fromage burger',
+  bechamel: 'Béchamel'
+}
+
+function humanizeIngredientId(id: string): string {
+  if (INGREDIENT_NAMES[id]) return INGREDIENT_NAMES[id]
+  const spaced = id.replace(/_/g, ' ')
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1)
 }
 
 const router = express.Router();
@@ -186,6 +229,64 @@ router.post('/import', async (req: Request, res: Response, next: NextFunction) =
   }
 })
 
+// POST /recipes/import-yaml - import family-meal-planner style YAML recipes
+router.post('/import-yaml', async (req: Request, res: Response, next: NextFunction) => {
+  const files = req.body?.files
+  if (!Array.isArray(files) || files.some((f) => typeof f !== 'string')) {
+    res.status(400).json({ error: 'Invalid data' })
+    return
+  }
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
+    let imported = 0
+    let skipped = 0
+
+    for (const file of files) {
+      const parsed = yaml.load(file) as FamilyMealPlannerRecipe
+      if (!parsed?.name) {
+        throw new Error('Missing required fields')
+      }
+
+      const { rows } = await client.query('SELECT 1 FROM recipes WHERE nom = $1', [parsed.name])
+      if (rows.length > 0) {
+        skipped += 1
+        continue
+      }
+
+      const mainIngredients = Array.isArray(parsed.mainIngredients) ? parsed.mainIngredients : []
+      const resolved: { ingredientId: string; uniteId: string | null; quantite: string }[] = []
+      for (const ing of mainIngredients) {
+        const uniteId = await findOrCreateUnite(client, ing.unit)
+        const ingredientId = await findOrCreateIngredient(client, humanizeIngredientId(ing.id), uniteId)
+        resolved.push({ ingredientId, uniteId, quantite: String(ing.amount) })
+      }
+
+      const recipeId = randomUUID()
+      await client.query(
+        `INSERT INTO recipes (id, nom, instructions, ingredient_principal_id, ingredient_secondaire_id, image_url)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [recipeId, parsed.name, null, resolved[0]?.ingredientId || null, resolved[1]?.ingredientId || null, null]
+      )
+
+      for (const r of resolved) {
+        await client.query(
+          'INSERT INTO recipe_ingredients (id, recipe_id, ingredient_id, quantite, unite_id) VALUES ($1, $2, $3, $4, $5)',
+          [randomUUID(), recipeId, r.ingredientId, r.quantite, r.uniteId]
+        )
+      }
+      imported += 1
+    }
+
+    await client.query('COMMIT')
+    res.json({ imported, skipped })
+  } catch (err) {
+    await client.query('ROLLBACK')
+    next(err)
+  } finally {
+    client.release()
+  }
+})
 
 // GET /recipes/:id - retrieve a single recipe
 // GET /recipes/:id/ingredients - list ingredients for a recipe
@@ -377,9 +478,9 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction): P
     for (const r of ingRows) {
       const ingId = r.ingredient_id as string;
       const { rows: refs } = await client.query(
-        `SELECT 1 FROM recipes WHERE ingredient_principal_id = $1 OR ingredient_secondaire_id = $1 LIMIT 1
+        `(SELECT 1 FROM recipes WHERE ingredient_principal_id = $1 OR ingredient_secondaire_id = $1 LIMIT 1)
          UNION ALL
-         SELECT 1 FROM recipe_ingredients WHERE ingredient_id = $1 LIMIT 1`,
+         (SELECT 1 FROM recipe_ingredients WHERE ingredient_id = $1 LIMIT 1)`,
         [ingId]
       );
       if (refs.length === 0) {

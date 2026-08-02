@@ -230,6 +230,16 @@ export async function importRecipes(data: unknown) {
   if (!res.ok) throw new Error('Failed to import recipes')
 }
 
+export async function importYamlRecipes(files: string[]): Promise<{ imported: number; skipped: number }> {
+  const res = await apiFetch(`${API_BASE_URL}/recipes/import-yaml`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ files })
+  })
+  if (!res.ok) throw new Error('Failed to import recipes')
+  return res.json()
+}
+
 export interface StockItem {
   id: string
   nom: string

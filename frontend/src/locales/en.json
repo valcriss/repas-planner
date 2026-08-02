@@ -57,11 +57,16 @@
     "fileToImport": "File to import",
     "import": "Import",
     "export": "Export",
+    "yamlFilesToImport": "YAML recipes to import",
+    "importYaml": "Import",
+    "yamlImportSummary": "{imported} recipe(s) imported, {skipped} already present",
     "imageAlt": "Recipe image"
   },
   "stockPage": {
     "title": "Stock",
-    "quantity": "Quantity"
+    "quantity": "Quantity",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock"
   },
   "days": {
     "lundi": "Monday",

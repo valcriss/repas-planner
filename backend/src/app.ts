@@ -22,7 +22,7 @@ const port = process.env.PORT || 3000;
 const frontendPath = process.env.FRONTEND_PATH || path.join(__dirname, 'public');
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.post('/api/login', loginRoute);
 app.post('/api/logout', logoutRoute);

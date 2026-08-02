@@ -87,54 +87,54 @@ onMounted(async () => {
 </script>
 <template>
   <div class="max-w-md mx-auto">
-    <h1 class="text-2xl font-bold mb-4">
+    <h1 class="text-2xl font-bold tracking-tight mb-6">
       {{ isEdit ? $t('addRecipe.editTitle') : $t('addRecipe.addTitle') }}
     </h1>
     <form
-      class="space-y-4"
+      class="space-y-5"
       @submit.prevent="submit"
     >
       <div>
-        <label class="block mb-1">{{ $t('addRecipe.name') }}</label>
+        <label class="block mb-1.5 text-sm font-semibold text-ink-secondary">{{ $t('addRecipe.name') }}</label>
         <input
           v-model="nom"
-          class="border rounded w-full p-2"
+          class="border border-line-strong rounded-ctl w-full p-2.5 bg-surface focus:border-accent transition"
           required
         >
       </div>
       <div>
-        <label class="block mb-1">{{ $t('addRecipe.instructions') }}</label>
+        <label class="block mb-1.5 text-sm font-semibold text-ink-secondary">{{ $t('addRecipe.instructions') }}</label>
         <textarea
           v-model="instructions"
-          class="border rounded w-full p-2"
+          class="border border-line-strong rounded-ctl w-full p-2.5 bg-surface focus:border-accent transition"
         />
       </div>
       <div>
-        <label class="block mb-1">{{ $t('addRecipe.imageUrl') }}</label>
+        <label class="block mb-1.5 text-sm font-semibold text-ink-secondary">{{ $t('addRecipe.imageUrl') }}</label>
         <input
           v-model="imageUrl"
-          class="border rounded w-full p-2"
+          class="border border-line-strong rounded-ctl w-full p-2.5 bg-surface focus:border-accent transition"
         >
       </div>
       <div>
-        <label class="block mb-1">{{ $t('addRecipe.ingredients') }}</label>
+        <label class="block mb-1.5 text-sm font-semibold text-ink-secondary">{{ $t('addRecipe.ingredients') }}</label>
         <div
           v-for="(_, idx) in ingredients"
           :key="idx"
-          class="mb-2"
+          class="mb-3 rounded-ctl border border-line bg-surface p-3"
         >
           <IngredientInput v-model="ingredients[idx]" />
           <p
             v-if="idx === 0"
-            class="text-sm text-gray-500"
+            class="text-xs text-ink-muted"
           >
             {{ $t('addRecipe.mainIngredient') }}
           </p>
           <div
             v-if="idx > 0"
-            class="flex items-center space-x-2"
+            class="flex items-center justify-between"
           >
-            <label class="flex items-center space-x-1">
+            <label class="flex items-center gap-1.5 text-sm text-ink-secondary">
               <input
                 type="checkbox"
                 :checked="secondaryIdx === idx"
@@ -144,7 +144,7 @@ onMounted(async () => {
             </label>
             <button
               type="button"
-              class="text-red-600 text-sm"
+              class="text-danger text-sm font-semibold hover:text-danger-ink transition"
               @click="removeIngredient(idx)"
             >
               {{ $t('addRecipe.removeIngredient') }}
@@ -153,7 +153,7 @@ onMounted(async () => {
         </div>
         <button
           type="button"
-          class="px-2 py-1 bg-gray-200 rounded"
+          class="rounded-full border border-line-strong bg-surface text-ink text-sm font-semibold px-4 py-2 hover:border-ink-muted transition"
           @click="addIngredient"
         >
           {{ $t('addRecipe.addIngredient') }}
@@ -161,7 +161,7 @@ onMounted(async () => {
       </div>
       <button
         type="submit"
-        class="px-3 py-1 bg-blue-600 text-white rounded"
+        class="rounded-full bg-accent text-white text-sm font-semibold px-5 py-2.5 shadow-card hover:brightness-105 transition"
       >
         {{ $t('addRecipe.save') }}
       </button>

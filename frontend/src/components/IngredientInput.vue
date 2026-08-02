@@ -108,46 +108,46 @@ function pickUnit(u: Unite) {
 }
 </script>
 <template>
-  <div class="mb-2">
+  <div>
     <input
       v-model="data.nom"
-      class="border rounded w-full p-1"
+      class="border border-line-strong rounded-ctl w-full p-2 bg-surface focus:border-accent transition"
       placeholder="Ingrédient"
     >
     <ul
       v-if="suggestions.length"
-      class="border bg-white"
+      class="border border-line rounded-ctl bg-surface shadow-card mt-1 overflow-hidden"
     >
       <li
         v-for="s in suggestions"
         :key="s.id"
-        class="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+        class="px-3 py-1.5 text-sm hover:bg-accent-tint hover:text-accent-ink cursor-pointer transition"
         @click="pick(s)"
       >
         {{ s.nom }}
       </li>
     </ul>
-    <div class="flex space-x-2 mt-1 relative">
+    <div class="flex gap-2 mt-2 relative">
       <input
         v-model="data.quantite"
-        class="border rounded p-1 w-20"
+        class="border border-line-strong rounded-ctl p-2 w-20 bg-surface focus:border-accent transition"
         placeholder="Qté"
       >
       <div class="flex-1">
         <input
           v-model="data.unite"
           :disabled="!!data.id"
-          class="border rounded p-1 w-full"
+          class="border border-line-strong rounded-ctl p-2 w-full bg-surface focus:border-accent transition disabled:opacity-60"
           placeholder="Unité"
         >
         <ul
           v-if="unitSuggestions.length"
-          class="border bg-white absolute left-20 right-0 z-10"
+          class="border border-line rounded-ctl bg-surface shadow-card absolute left-20 right-0 z-10 overflow-hidden"
         >
           <li
             v-for="u in unitSuggestions"
             :key="u.id"
-            class="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+            class="px-3 py-1.5 text-sm hover:bg-accent-tint hover:text-accent-ink cursor-pointer transition"
             @click="pickUnit(u)"
           >
             {{ u.nom }}

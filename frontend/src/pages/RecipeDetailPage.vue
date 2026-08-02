@@ -39,46 +39,58 @@ async function remove() {
   >
     <button
       type="button"
-      class="text-blue-600"
+      class="inline-flex items-center gap-1 text-sm font-semibold text-ink-secondary hover:text-ink transition"
       @click="router.back()"
     >
-      &larr; {{ $t('recipeDetail.back') }}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="w-4 h-4"
+      ><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
+      {{ $t('recipeDetail.back') }}
     </button>
-    <h1 class="text-3xl font-bold my-4">
+    <h1 class="text-3xl font-bold tracking-tight my-4">
       {{ recipe.nom }}
     </h1>
     <img
       v-if="recipe.image_url"
       :src="recipe.image_url"
-      class="mb-4 w-full object-cover rounded"
+      class="mb-6 w-full h-64 object-cover rounded-card border border-line shadow-card"
     >
-    <h2 class="text-xl font-semibold mb-2">
+    <h2 class="text-lg font-semibold mb-2">
       {{ $t('recipeDetail.ingredients') }}
     </h2>
-    <ul class="list-disc list-inside mb-4">
+    <ul class="mb-6 divide-y divide-line rounded-ctl border border-line bg-surface overflow-hidden">
       <li
         v-for="ing in ingredients"
         :key="ing.id"
+        class="flex items-center gap-2 px-4 py-2.5 text-sm"
       >
-        {{ ing.nom }} : {{ ing.quantite }} {{ ing.unite }}
+        <span class="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+        <span class="font-medium">{{ ing.nom }}</span>
+        <span class="ml-auto text-ink-secondary tabular-nums">{{ ing.quantite }} {{ ing.unite }}</span>
       </li>
     </ul>
-    <h2 class="text-xl font-semibold mb-2">
+    <h2 class="text-lg font-semibold mb-2">
       {{ $t('recipeDetail.description') }}
     </h2>
-    <p class="whitespace-pre-line">
+    <p class="whitespace-pre-line text-ink-secondary leading-relaxed">
       {{ recipe.instructions }}
     </p>
-    <div class="mt-4 space-x-2">
+    <div class="mt-6 flex gap-2">
       <RouterLink
         :to="`/recipes/${recipe.id}/edit`"
-        class="px-3 py-1 bg-blue-600 text-white rounded"
+        class="rounded-full bg-accent text-white text-sm font-semibold px-4 py-2 shadow-card hover:brightness-105 transition"
       >
         {{ $t('recipeDetail.edit') }}
       </RouterLink>
       <button
         type="button"
-        class="px-3 py-1 bg-red-600 text-white rounded"
+        class="rounded-full border border-danger/40 text-danger text-sm font-semibold px-4 py-2 hover:bg-danger-tint transition"
         @click="remove"
       >
         {{ $t('recipeDetail.delete') }}
